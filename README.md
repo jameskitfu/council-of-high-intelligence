@@ -184,39 +184,39 @@ Normal usage auto-selects a three-member triad. The `--full` flag invokes all 22
 <details>
 <summary><strong>Pre-defined Triads</strong> — 31 domain-specific 3-member combinations</summary>
 
-| Domain | Triad | Rationale |
-|--------|-------|-----------|
-| `architecture` | Aristotle + Ada + Feynman | Classify + formalize + simplicity-test |
-| `strategy` | Sun Tzu + Machiavelli + Aurelius | Terrain + incentives + moral grounding |
-| `ethics` | Aurelius + Socrates + Lao Tzu | Duty + questioning + natural order |
-| `debugging` | Feynman + Socrates + Ada | Bottom-up + assumption testing + formal verification |
-| `innovation` | Ada + Lao Tzu + Aristotle | Abstraction + emergence + classification |
-| `conflict` | Socrates + Machiavelli + Aurelius | Expose + predict + ground |
-| `complexity` | Lao Tzu + Aristotle + Ada | Emergence + categories + formalism |
-| `risk` | Sun Tzu + Aurelius + Feynman | Threats + resilience + empirical verification |
-| `shipping` | Torvalds + Musashi + Feynman | Pragmatism + timing + first-principles |
-| `product` | Torvalds + Machiavelli + Watts | Ship it + incentives + reframing |
-| `founder` | Musashi + Sun Tzu + Torvalds | Timing + terrain + engineering reality |
-| `ai` | Karpathy + Sutskever + Ada | Empirical ML + scaling frontier + formal limits |
-| `ai-product` | Karpathy + Torvalds + Machiavelli | ML capability + shipping pragmatism + incentives |
-| `ai-safety` | Sutskever + Aurelius + Socrates | Safety frontier + moral clarity + assumption destruction |
-| `decision` | Kahneman + Munger + Aurelius | Bias detection + inversion + moral clarity |
-| `systems` | Meadows + Lao Tzu + Aristotle | Feedback loops + emergence + categories |
-| `uncertainty` | Taleb + Sun Tzu + Sutskever | Tail risk + terrain + scaling frontier |
-| `design` | Rams + Torvalds + Watts | User clarity + maintainability + reframing |
-| `economics` | Munger + Machiavelli + Sun Tzu | Models + incentives + competition |
-| `bias` | Kahneman + Socrates + Watts | Cognitive bias + assumption destruction + frame audit |
-| `creative` | Rubin + Leonardo + Rams | Artistic truth + invention + user clarity |
-| `creator` | Rubin + Jobs + Watts | Authentic work + product direction + reframing |
-| `editing` | Rubin + Rams + Feynman | Essence + clarity + comprehension test |
-| `product-vision` | Jobs + Rams + Torvalds | Integrated experience + user need + feasibility |
-| `launch` | Jobs + Musashi + Machiavelli | Story + timing + incentives |
-| `creator-product` | Jobs + Rubin + Karpathy | Packaging + authenticity + AI capability |
-| `invention` | Leonardo + Ada + Feynman | Observation + formalization + empirical testing |
-| `prototype` | Leonardo + Torvalds + Karpathy | Sketch + build + empirical iteration |
-| `language-learning` | Krashen + Kahneman + Feynman | Acquisition + learning bias + reality check |
-| `learn-in-public` | Krashen + Leonardo + Rubin | Input + visible learning + authentic expression |
-| `english-content` | Krashen + Jobs + Rams | Acquisition value + content promise + viewer clarity |
+| Domain | Triad | Rationale | Example Question |
+|--------|-------|-----------|------------------|
+| `architecture` | Aristotle + Ada + Feynman | Classify + formalize + simplicity-test | Should we split our monolith into microservices now? |
+| `strategy` | Sun Tzu + Machiavelli + Aurelius | Terrain + incentives + moral grounding | How should we enter a market dominated by two larger competitors? |
+| `ethics` | Aurelius + Socrates + Lao Tzu | Duty + questioning + natural order | Should we ship a persuasive feature that may encourage compulsive use? |
+| `debugging` | Feynman + Socrates + Ada | Bottom-up + assumption testing + formal verification | Why does this service fail only under production load? |
+| `innovation` | Ada + Lao Tzu + Aristotle | Abstraction + emergence + classification | How can we redesign online learning without copying existing course platforms? |
+| `conflict` | Socrates + Machiavelli + Aurelius | Expose + predict + ground | How should two cofounders resolve a deadlock over product direction? |
+| `complexity` | Lao Tzu + Aristotle + Ada | Emergence + categories + formalism | How can we simplify a workflow with too many interacting rules? |
+| `risk` | Sun Tzu + Aurelius + Feynman | Threats + resilience + empirical verification | What could make this launch fail catastrophically, and how do we reduce the risk? |
+| `shipping` | Torvalds + Musashi + Feynman | Pragmatism + timing + first-principles | Is this product ready to release this week, or should we delay? |
+| `product` | Torvalds + Machiavelli + Watts | Ship it + incentives + reframing | Which feature should we build next to create the most user value? |
+| `founder` | Musashi + Sun Tzu + Torvalds | Timing + terrain + engineering reality | Should I leave my job to work on this startup full-time? |
+| `ai` | Karpathy + Sutskever + Ada | Empirical ML + scaling frontier + formal limits | Which model architecture should we test for this reasoning task? |
+| `ai-product` | Karpathy + Torvalds + Machiavelli | ML capability + shipping pragmatism + incentives | How should we turn this AI prototype into a reliable paid product? |
+| `ai-safety` | Sutskever + Aurelius + Socrates | Safety frontier + moral clarity + assumption destruction | What safeguards do we need before letting this agent take actions? |
+| `decision` | Kahneman + Munger + Aurelius | Bias detection + inversion + moral clarity | Should we hire now or preserve runway for six more months? |
+| `systems` | Meadows + Lao Tzu + Aristotle | Feedback loops + emergence + categories | Why does improving one team's metric make the overall system worse? |
+| `uncertainty` | Taleb + Sun Tzu + Sutskever | Tail risk + terrain + scaling frontier | How should we plan when demand could be ten times higher or lower? |
+| `design` | Rams + Torvalds + Watts | User clarity + maintainability + reframing | How can we make this onboarding flow clearer without adding more screens? |
+| `economics` | Munger + Machiavelli + Sun Tzu | Models + incentives + competition | Will this freemium model create sustainable unit economics? |
+| `bias` | Kahneman + Socrates + Watts | Cognitive bias + assumption destruction + frame audit | What assumptions are distorting our belief that users want this feature? |
+| `creative` | Rubin + Leonardo + Rams | Artistic truth + invention + user clarity | How can I make this video concept more original without losing clarity? |
+| `creator` | Rubin + Jobs + Watts | Authentic work + product direction + reframing | What should my YouTube channel stand for so viewers remember it? |
+| `editing` | Rubin + Rams + Feynman | Essence + clarity + comprehension test | What should I cut from this video to make the core idea land? |
+| `product-vision` | Jobs + Rams + Torvalds | Integrated experience + user need + feasibility | What should the complete user experience feel like three years from now? |
+| `launch` | Jobs + Musashi + Machiavelli | Story + timing + incentives | How should we position and launch this product to earn early trust? |
+| `creator-product` | Jobs + Rubin + Karpathy | Packaging + authenticity + AI capability | How can I turn my AI engineering content into a useful product? |
+| `invention` | Leonardo + Ada + Feynman | Observation + formalization + empirical testing | How could we solve this problem with a mechanism that does not exist yet? |
+| `prototype` | Leonardo + Torvalds + Karpathy | Sketch + build + empirical iteration | What is the smallest prototype that can test the riskiest assumption? |
+| `language-learning` | Krashen + Kahneman + Feynman | Acquisition + learning bias + reality check | How can I improve my English listening without turning practice into memorization? |
+| `learn-in-public` | Krashen + Leonardo + Rubin | Input + visible learning + authentic expression | How should I document my AI learning journey without pretending to be an expert? |
+| `english-content` | Krashen + Jobs + Rams | Acquisition value + content promise + viewer clarity | How can I make English YouTube videos that learners understand and native viewers still enjoy? |
 
 </details>
 
