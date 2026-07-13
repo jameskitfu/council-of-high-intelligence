@@ -21,6 +21,8 @@ pass "SKILL.codex.md exists"
 if compgen -G "agents/council-*.md" >/dev/null; then
   agent_count=$(python3 -c "import glob; print(len(glob.glob('agents/council-*.md')))" 2>/dev/null || echo "unknown")
   pass "Agent definitions found (count=${agent_count})"
+  [[ "${agent_count}" -eq 22 ]] || fail "Expected 22 council agents, found ${agent_count}"
+  pass "Exactly 22 council agent definitions found"
 else
   fail "No agent definitions found under agents/council-*.md"
 fi
@@ -111,6 +113,23 @@ pass "Session Metadata schema wired in SKILL.md"
 grep -q "Session Metadata\|session metadata\|session_metadata" SKILL.codex.md || fail "Session Metadata missing in SKILL.codex.md (issue #7)"
 pass "Session Metadata referenced in SKILL.codex.md"
 
+# Creator-learner platform integration
+platform_files=(SKILL.md SKILL.codex.md SKILL.gemini.md)
+creator_learner_members=(jobs rubin leonardo krashen)
+creator_learner_triads=(creative creator editing product-vision launch creator-product invention prototype language-learning learn-in-public english-content)
+
+for platform_file in "${platform_files[@]}"; do
+  [[ -f "${platform_file}" ]] || fail "${platform_file} is missing"
+  for member_name in "${creator_learner_members[@]}"; do
+    grep -q "${member_name}" "${platform_file}" || fail "Creator-learner member '${member_name}' missing in ${platform_file}"
+  done
+  grep -q "ai-creator-learner" "${platform_file}" || fail "ai-creator-learner profile missing in ${platform_file}"
+  for triad_name in "${creator_learner_triads[@]}"; do
+    grep -Fq "\`${triad_name}\`" "${platform_file}" || fail "Creator-learner triad '${triad_name}' missing in ${platform_file}"
+  done
+done
+pass "Creator-learner members, profile, and triads wired across all platform coordinators"
+
 # --- Agent structure checks ---
 
 required_sections=("Identity" "Grounding Protocol" "Analytical Method" "What You See" "What You Tend to Miss" "When Deliberating" "Output Format (Council Round 2)" "Output Format (Standalone)")
@@ -155,7 +174,7 @@ fi
 
 # --- Triad member validation ---
 
-for member_name in aristotle socrates feynman ada sun-tzu machiavelli aurelius lao-tzu torvalds musashi watts karpathy sutskever kahneman meadows munger taleb rams; do
+for member_name in aristotle socrates feynman ada sun-tzu machiavelli aurelius lao-tzu torvalds musashi watts karpathy sutskever kahneman meadows munger taleb rams jobs rubin leonardo krashen; do
   if [[ ! -f "agents/council-${member_name}.md" ]]; then
     fail "Missing agent file for triad member: council-${member_name}.md"
   fi
