@@ -121,7 +121,9 @@ creator_learner_triads=(creative creator editing product-vision launch creator-p
 for platform_file in "${platform_files[@]}"; do
   [[ -f "${platform_file}" ]] || fail "${platform_file} is missing"
   for member_name in "${creator_learner_members[@]}"; do
-    grep -q "${member_name}" "${platform_file}" || fail "Creator-learner member '${member_name}' missing in ${platform_file}"
+    if ! grep -Fq "\`${member_name}\`" "${platform_file}" && ! grep -Fq "\`council-${member_name}\`" "${platform_file}"; then
+      fail "Creator-learner member '${member_name}' missing in ${platform_file}"
+    fi
   done
   grep -q "ai-creator-learner" "${platform_file}" || fail "ai-creator-learner profile missing in ${platform_file}"
   for triad_name in "${creator_learner_triads[@]}"; do
