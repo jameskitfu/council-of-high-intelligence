@@ -71,12 +71,14 @@ Flag priority: `--quick` / `--duo` set the mode. `--full` / `--triad` / `--membe
 ## Polarity Pairs
 
 - **Socrates vs Feynman** — Destroys top-down vs rebuilds bottom-up
+- **Socrates vs Watts** — Destroys assumptions vs dissolves the frame
 - **Aristotle vs Lao Tzu** — Classifies everything vs structure IS the problem
 - **Sun Tzu vs Aurelius** — Wins external games vs governs the internal one
 - **Ada vs Machiavelli** — Formal purity vs messy human incentives
 - **Torvalds vs Watts** — Ships concrete solutions vs questions whether the problem exists
 - **Musashi vs Torvalds** — Waits for the perfect moment vs ships it now
 - **Karpathy vs Sutskever** — Build it, observe it, iterate vs pause, research, ensure safety first
+- **Sutskever vs Machiavelli** — Safety ideals vs industry incentives
 - **Karpathy vs Ada** — Empirical ML intuition vs formal systems theory
 - **Kahneman vs Feynman** — Your cognition is the first error vs trust first-principles reasoning
 - **Meadows vs Torvalds** — Redesign the feedback loop vs fix the symptom and ship

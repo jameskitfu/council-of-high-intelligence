@@ -118,6 +118,7 @@ pass "Session Metadata referenced in SKILL.codex.md"
 if ! python3 - <<'PY'
 from pathlib import Path
 import ast
+from collections import Counter
 import re
 
 EXPECTED_IDS = {
@@ -138,6 +139,15 @@ EXPECTED_NEW_TRIADS = {
     "language-learning": {"krashen", "kahneman", "feynman"},
     "learn-in-public": {"krashen", "leonardo", "rubin"},
     "english-content": {"krashen", "jobs", "rams"},
+}
+EXPECTED_CREATOR_PAIRS = {
+    ("jobs", "rubin"),
+    ("jobs", "rams"),
+    ("jobs", "torvalds"),
+    ("rubin", "torvalds"),
+    ("aristotle", "leonardo"),
+    ("ada", "leonardo"),
+    ("feynman", "krashen"),
 }
 EXPECTED_PROFILES = {
     "classic": EXPECTED_IDS,
@@ -174,6 +184,32 @@ def compare_sets(label, actual, expected):
         errors.append(
             f"{label}: missing [{describe(expected - actual)}]; "
             f"unexpected [{describe(actual - expected)}]"
+        )
+
+
+def duplicates(values):
+    return sorted(value for value, count in Counter(values).items() if count > 1)
+
+
+def require_unique(label, values):
+    repeated = duplicates(values)
+    if repeated:
+        errors.append(f"{label}: duplicate values [{describe(repeated)}]")
+
+
+def undirected_pair(first, second):
+    return tuple(sorted((first, second)))
+
+
+def describe_pairs(pairs):
+    return ", ".join(f"{first}<->{second}" for first, second in sorted(pairs)) or "<none>"
+
+
+def compare_pair_sets(label, actual, expected):
+    if actual != expected:
+        errors.append(
+            f"{label}: missing [{describe_pairs(expected - actual)}]; "
+            f"unexpected [{describe_pairs(actual - expected)}]"
         )
 
 
@@ -279,16 +315,22 @@ for path in agent_paths:
 skill_text = Path("SKILL.md").read_text()
 skill_roster_rows = table_rows(markdown_section(skill_text, "The 22 Council Members"))
 figure_to_id = {}
-skill_roster = set()
+skill_roster_ids = []
 for row in skill_roster_rows:
+    if len(row) != 5:
+        errors.append(f"SKILL.md roster row must have exactly 5 columns, found {len(row)}: {row!r}")
     if len(row) < 2:
         continue
     match = re.fullmatch(r"`council-([^`]+)`", row[0])
     if not match:
         continue
     agent_id = match.group(1)
-    skill_roster.add(agent_id)
+    skill_roster_ids.append(agent_id)
     figure_to_id[row[1].casefold()] = agent_id
+if len(skill_roster_ids) != len(EXPECTED_IDS):
+    errors.append(f"SKILL.md roster must contain exactly {len(EXPECTED_IDS)} rows, found {len(skill_roster_ids)}")
+require_unique("SKILL.md roster", skill_roster_ids)
+skill_roster = set(skill_roster_ids)
 compare_sets("SKILL.md roster", skill_roster, EXPECTED_IDS)
 
 aliases = {agent_id.casefold(): agent_id for agent_id in EXPECTED_IDS}
@@ -307,16 +349,50 @@ def resolve_member(raw, label):
     return agent_id
 
 
+canonical_pair_list = []
+for line in markdown_section(skill_text, "Polarity Pairs"):
+    if not line.strip():
+        continue
+    match = re.fullmatch(r"- \*\*(.+?) vs (.+?)\*\* — .+", line)
+    if not match:
+        errors.append(f"SKILL.md polarity pair row has invalid format: {line!r}")
+        continue
+    first = resolve_member(match.group(1), "SKILL.md polarity pairs")
+    second = resolve_member(match.group(2), "SKILL.md polarity pairs")
+    if first is None or second is None:
+        continue
+    if first == second:
+        errors.append(f"SKILL.md polarity pair cannot point {first} to itself")
+        continue
+    canonical_pair_list.append(undirected_pair(first, second))
+if duplicates(canonical_pair_list):
+    errors.append(f"SKILL.md polarity pairs contain duplicate undirected pairs [{describe_pairs(set(duplicates(canonical_pair_list)))}]")
+canonical_pairs = set(canonical_pair_list)
+missing_creator_pairs = EXPECTED_CREATOR_PAIRS - canonical_pairs
+if missing_creator_pairs:
+    errors.append(f"SKILL.md is missing creator-learner pairs [{describe_pairs(missing_creator_pairs)}]")
+
+
 canonical_triads = {}
-for row in table_rows(markdown_section(skill_text, "Pre-defined Triads")):
+canonical_triad_rows = table_rows(markdown_section(skill_text, "Pre-defined Triads"))
+canonical_triad_ids = [row[0].strip("`") for row in canonical_triad_rows]
+require_unique("SKILL.md predefined triad rows", canonical_triad_ids)
+for row in canonical_triad_rows:
+    if len(row) != 3:
+        errors.append(f"SKILL.md triad row must have exactly 3 columns, found {len(row)}: {row!r}")
     if len(row) < 2:
         continue
     triad = row[0].strip("`")
-    members = {
+    raw_members = [member.strip() for member in row[1].split("+") if member.strip()]
+    if len(raw_members) != 3:
+        errors.append(f"SKILL.md triad {triad} must contain exactly 3 members, found {len(raw_members)}")
+    member_ids = [
         member_id
-        for member in row[1].split("+")
+        for member in raw_members
         if (member_id := resolve_member(member, f"SKILL.md triad {triad}")) is not None
-    }
+    ]
+    require_unique(f"SKILL.md triad {triad}", member_ids)
+    members = set(member_ids)
     if triad in canonical_triads:
         errors.append(f"SKILL.md triad {triad!r} is duplicated")
     canonical_triads[triad] = members
@@ -341,8 +417,9 @@ for agent_id in sorted(EXPECTED_IDS & actual_ids):
     compare_sets(f"{agent_id} frontmatter triads", actual_triads, expected_triads_by_member[agent_id])
     compare_sets(f"{agent_id} frontmatter profiles", actual_profiles, expected_profiles_by_member[agent_id])
 
+frontmatter_pairs = set()
 for agent_id in sorted(EXPECTED_IDS & actual_ids):
-    pairs = agent_metadata[agent_id].get("polarity_pairs", [])
+    pairs = agent_metadata[agent_id].get("polarity_pairs")
     if not isinstance(pairs, list):
         errors.append(f"{agent_id}: council.polarity_pairs is missing")
         continue
@@ -351,8 +428,11 @@ for agent_id in sorted(EXPECTED_IDS & actual_ids):
             errors.append(f"{agent_id}: polarity pair points to unknown agent {peer!r}")
         elif peer == agent_id:
             errors.append(f"{agent_id}: polarity pair cannot point to itself")
-        elif agent_id not in agent_metadata.get(peer, {}).get("polarity_pairs", []):
-            errors.append(f"one-way polarity pair: {agent_id} -> {peer}, but {peer} does not point to {agent_id}")
+        else:
+            frontmatter_pairs.add(undirected_pair(agent_id, peer))
+            if agent_id not in agent_metadata.get(peer, {}).get("polarity_pairs", []):
+                errors.append(f"one-way polarity pair: {agent_id} -> {peer}, but {peer} does not point to {agent_id}")
+compare_pair_sets("frontmatter polarity pair graph", frontmatter_pairs, canonical_pairs)
 
 
 def parse_compact_roster(text, platform):
@@ -362,20 +442,64 @@ def parse_compact_roster(text, platform):
     if len(values) != 1:
         errors.append(f"{platform}: expected one Member Roster code span, found {len(values)}")
         return set()
-    return {token.strip() for token in values[0].split(",") if token.strip()}
+    roster_ids = [token.strip() for token in values[0].split(",") if token.strip()]
+    if len(roster_ids) != len(EXPECTED_IDS):
+        errors.append(f"{platform}: roster must contain exactly {len(EXPECTED_IDS)} members, found {len(roster_ids)}")
+    require_unique(f"{platform} roster", roster_ids)
+    return set(roster_ids)
 
 
 def parse_compact_triads(text, platform):
     triads = {}
-    for row in table_rows(markdown_section(text, "Triads")):
+    rows = table_rows(markdown_section(text, "Triads"))
+    triad_ids = [row[0].strip("`") for row in rows]
+    require_unique(f"{platform} triad rows", triad_ids)
+    for row in rows:
+        if len(row) != 2:
+            errors.append(f"{platform}: triad row must have exactly 2 columns, found {len(row)}: {row!r}")
         if len(row) < 2:
             continue
         triad = row[0].strip("`")
-        members = {token.strip().strip("`") for token in row[1].split(",") if token.strip()}
+        member_ids = [token.strip().strip("`") for token in row[1].split(",") if token.strip()]
+        if len(member_ids) != 3:
+            errors.append(f"{platform}: triad {triad} must contain exactly 3 members, found {len(member_ids)}")
+        require_unique(f"{platform} triad {triad}", member_ids)
+        for member_id in member_ids:
+            if member_id not in EXPECTED_IDS:
+                errors.append(f"{platform}: triad {triad} points to unknown agent {member_id!r}")
+        members = set(member_ids)
         if triad in triads:
             errors.append(f"{platform}: triad {triad!r} is duplicated")
         triads[triad] = members
     return triads
+
+
+def parse_compact_pairs(text, platform):
+    pair_list = []
+    for line in markdown_section(text, "Creator-Learner Polarity Pairs"):
+        if not line.strip():
+            continue
+        match = re.fullmatch(r"- `([^`]+)` \+ `([^`]+)`", line)
+        if not match:
+            errors.append(f"{platform}: creator-learner pair row has invalid format: {line!r}")
+            continue
+        first, second = match.groups()
+        if first not in EXPECTED_IDS or second not in EXPECTED_IDS:
+            errors.append(f"{platform}: creator-learner pair points to unknown agents {first!r}, {second!r}")
+            continue
+        if first == second:
+            errors.append(f"{platform}: creator-learner pair cannot point {first} to itself")
+            continue
+        pair_list.append(undirected_pair(first, second))
+    if len(pair_list) != len(EXPECTED_CREATOR_PAIRS):
+        errors.append(
+            f"{platform}: creator-learner pair section must contain exactly "
+            f"{len(EXPECTED_CREATOR_PAIRS)} rows, found {len(pair_list)}"
+        )
+    repeated = duplicates(pair_list)
+    if repeated:
+        errors.append(f"{platform}: duplicate creator-learner pairs [{describe_pairs(set(repeated))}]")
+    return set(pair_list)
 
 
 def parse_skill_profiles(text):
@@ -423,6 +547,18 @@ coordinator_texts = {
     "SKILL.codex.md": Path("SKILL.codex.md").read_text(),
     "SKILL.gemini.md": Path("SKILL.gemini.md").read_text(),
 }
+coordinator_creator_pairs = {
+    "SKILL.codex.md": parse_compact_pairs(coordinator_texts["SKILL.codex.md"], "SKILL.codex.md"),
+    "SKILL.gemini.md": parse_compact_pairs(coordinator_texts["SKILL.gemini.md"], "SKILL.gemini.md"),
+}
+for platform, pairs in coordinator_creator_pairs.items():
+    compare_pair_sets(f"{platform} creator-learner pair set", pairs, EXPECTED_CREATOR_PAIRS)
+compare_pair_sets(
+    "Codex/Gemini creator-learner pair equivalence",
+    coordinator_creator_pairs["SKILL.codex.md"],
+    coordinator_creator_pairs["SKILL.gemini.md"],
+)
+
 coordinator_rosters = {
     "SKILL.md": skill_roster,
     "SKILL.codex.md": parse_compact_roster(coordinator_texts["SKILL.codex.md"], "SKILL.codex.md"),
@@ -465,6 +601,10 @@ for readme_name, count_markers in readme_count_markers.items():
             errors.append(f"{readme_name}: council-{agent_id} is missing")
     if "ai-creator-learner" not in readme:
         errors.append(f"{readme_name}: ai-creator-learner is missing")
+    for install_flag in ("--gemini", "--gemini-only"):
+        install_pattern = rf"^\./install\.sh {re.escape(install_flag)}(?:\s|$)"
+        if not re.search(install_pattern, readme, re.MULTILINE):
+            errors.append(f"{readme_name}: ./install.sh {install_flag} example is missing")
 
 if "22 member personas" not in Path("CLAUDE.md").read_text():
     errors.append("CLAUDE.md must state 22 member personas")
@@ -537,6 +677,12 @@ pass "install.sh --dry-run --codex completed"
 
 grep -q "Installed Codex skill to" /tmp/council-install-dry-run-codex.log || fail "codex dry-run output missing Codex skill summary"
 pass "Codex install summary output present"
+
+./install.sh --dry-run --gemini >/tmp/council-install-dry-run-gemini.log
+pass "install.sh --dry-run --gemini completed"
+
+grep -q "Installed Gemini skill to" /tmp/council-install-dry-run-gemini.log || fail "gemini dry-run output missing Gemini skill summary"
+pass "Gemini install summary output present"
 
 echo
 echo "Checklist complete."
