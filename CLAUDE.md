@@ -4,7 +4,7 @@
 
 - `SKILL.md` — coordinator protocol with execution sequence, modes, and verdict templates
 - `SKILL.codex.md` — Codex-specific council coordinator protocol
-- `agents/council-*.md` — 18 member personas with YAML frontmatter
+- `agents/council-*.md` — 22 member personas with YAML frontmatter
 - `install.sh` — installs to `~/.claude/` and optionally `~/.codex/skills/council/`
 - `configs/` — provider/model routing templates
 - `demos/` — example prompts and scoring rubric
@@ -17,6 +17,7 @@
 - Grounding Protocol appears **immediately after Identity** (LLMs weight earlier instructions more heavily)
 - "What You See" and "What You Miss" sections: ≤3 sentences each
 - Every agent gets a Council Round 2 output format with structured headers (Disagree, Strengthened by, Position Update, Evidence Label)
+- New agents must be wired into all three platform coordinators (`SKILL.md`, `SKILL.codex.md`, `SKILL.gemini.md`) and both READMEs (`README.md`, `README.zh-CN.md`)
 
 ### SKILL.md
 - Coordinator instructions are an **execution sequence** with numbered STEPs and `[CHECKPOINT]`/`[VERIFY]` markers

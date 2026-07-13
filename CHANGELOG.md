@@ -7,6 +7,7 @@ This project uses [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## [Unreleased]
 
 ### Added
+- Expanded the council from 18 to 22 members with Rick Rubin, Steve Jobs, Leonardo da Vinci, and Stephen Krashen; added 11 creator, product, invention, and language-learning triads plus the 8-member `ai-creator-learner` profile.
 - **Structured stance voting + deterministic weighted tie-break.** The final round (full Round 3 / quick Round 2) now requires each member to emit a machine-parseable `STANCE: <option> | CONFIDENCE: … | DEALBREAKER: …` line, so consensus is a counted weighted tally rather than a prose impression. STEP 6 specifies the exact math: `W_option ≥ (2/3) × W_total`, with the on-domain seat carrying 1.5×. New **Vote Tally** field in the full and quick verdict templates records `option → weight` and which seat carried the weight. Mirrored in `SKILL.codex.md`.
 - Cursor CLI provider support (`cursor_cli` archetype) — sixth dispatch path alongside subagent / codex_exec / gemini_cli / ollama_run / openai_compatible_api. Auto-detected via the `cursor-agent` binary; members run headless and read-only (`cursor-agent -p --mode ask --model <id>`). Cursor is a model aggregator (GPT-5.x / Claude / Gemini / Grok through one CLI), so routing treats it as a single provider for spread and steers diversity seats to cross-family models to avoid duplicating Anthropic bias. New `configs/provider-model-slots.cursor.example.yaml`, `cursor_cli` tiers in `configs/auto-route-defaults.yaml`, and `cursor_cli` as a valid `--chairman` tag.
 

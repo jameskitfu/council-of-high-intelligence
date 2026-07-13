@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  18 AI personas deliberate your hardest decisions across multiple LLM providers. One command.
+  22 AI personas deliberate your hardest decisions across multiple LLM providers. One command.
 </p>
 
 <p align="center">
@@ -18,7 +18,7 @@
   <a href="https://creativecommons.org/publicdomain/zero/1.0/"><img src="https://img.shields.io/badge/license-CC0-blue" alt="License"></a>
   <img src="https://img.shields.io/badge/Claude_Code-skill-blueviolet" alt="Claude Code Skill">
   <img src="https://img.shields.io/badge/Codex-skill-black" alt="Codex Skill">
-  <img src="https://img.shields.io/badge/members-18-orange" alt="18 Members">
+  <img src="https://img.shields.io/badge/members-22-orange" alt="22 Members">
 </p>
 
 <details>
@@ -26,7 +26,7 @@
 
 - [Quickstart](#quickstart)
 - [Why This Works](#why-this-works)
-- [The 18 Council Members](#the-18-council-members)
+- [The 22 Council Members](#the-22-council-members)
 - [Three Deliberation Modes](#three-deliberation-modes)
 - [Multi-Provider Auto-Routing](#multi-provider-auto-routing)
 - [Deliberation Protocol](#deliberation-protocol)
@@ -80,9 +80,9 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 - **Know what the council can't answer** — verdicts lead with Unresolved Questions and Recommended Next Steps, not with confident-sounding consensus. What the council doesn't know matters more than where it agrees
 - **Prevent groupthink** — dissent quotas, novelty gates, and counterfactual prompts enforce genuine disagreement. If >70% agree too early, two members are forced to steelman the opposing view
 
-> **Why not just ask Claude directly?** A single prompt gives you one model's confident best guess. The council gives you 3-18 independent analyses from different intellectual traditions, forces them to challenge each other's claims, and synthesizes a verdict that surfaces disagreement rather than hiding it. It's the difference between asking one advisor and convening a board.
+> **Why not just ask Claude directly?** A single prompt gives you one model's confident best guess. The council gives you 3-22 independent analyses from different intellectual traditions, forces them to challenge each other's claims, and synthesizes a verdict that surfaces disagreement rather than hiding it. It's the difference between asking one advisor and convening a board.
 
-## The 18 Council Members
+## The 22 Council Members
 
 | Agent | Figure | Domain | Default Model | Polarity |
 |-------|--------|--------|-------|----------|
@@ -104,6 +104,10 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 | `council-munger` | Charlie Munger | Multi-model reasoning & economics | sonnet | Invert — what guarantees failure? |
 | `council-taleb` | Nassim Taleb | Antifragility & tail risk | opus | Design for the tail, not the average |
 | `council-rams` | Dieter Rams | User-centered design | sonnet | Less, but better — the user decides |
+| `council-rubin` | Rick Rubin | Creative direction & artistic truth | opus | Listen to what the work wants to become |
+| `council-jobs` | Steve Jobs | Product taste & integrated experience | opus | Shape the whole experience around one clear promise |
+| `council-leonardo` | Leonardo da Vinci | Observational synthesis & visual invention | opus | See it, sketch it, then understand it |
+| `council-krashen` | Stephen Krashen | Language acquisition & comprehensible input | sonnet | Acquire through meaningful input before forcing output |
 
 <details>
 <summary><strong>Polarity Pairs</strong> — members are chosen as deliberate counterweights</summary>
@@ -121,6 +125,13 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 - **Munger vs Aristotle** — Multi-model lattice vs single taxonomic system
 - **Taleb vs Karpathy** — Hidden catastrophic tails vs smooth empirical scaling curves
 - **Rams vs Ada** — What the user needs vs what computation can do
+- **Jobs vs Rubin** — Integrated product experience vs artistic truth
+- **Jobs vs Rams** — Coherent product promise vs user-centered clarity
+- **Jobs vs Torvalds** — End-to-end experience vs implementation feasibility
+- **Rubin vs Torvalds** — Creative truth vs production constraints
+- **Leonardo vs Aristotle** — Direct observation vs stable categories
+- **Leonardo vs Ada** — Visual invention vs formal abstraction
+- **Krashen vs Feynman** — Natural acquisition vs explicit explanation and testing
 
 </details>
 
@@ -128,6 +139,8 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 
 ### Full Mode (default)
 3-round structured deliberation: independent analysis → cross-examination → final positions.
+
+Normal usage auto-selects a three-member triad. The `--full` flag invokes all 22 members and is the most expensive mode.
 
 ```
 /council Should we open-source our agent framework?
@@ -152,7 +165,7 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 ```
 
 <details>
-<summary><strong>Pre-defined Triads</strong> — 20 domain-specific 3-member combinations</summary>
+<summary><strong>Pre-defined Triads</strong> — 31 domain-specific 3-member combinations</summary>
 
 | Domain | Triad | Rationale |
 |--------|-------|-----------|
@@ -176,6 +189,17 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 | `design` | Rams + Torvalds + Watts | User clarity + maintainability + reframing |
 | `economics` | Munger + Machiavelli + Sun Tzu | Models + incentives + competition |
 | `bias` | Kahneman + Socrates + Watts | Cognitive bias + assumption destruction + frame audit |
+| `creative` | Rubin + Leonardo + Rams | Artistic truth + invention + user clarity |
+| `creator` | Rubin + Jobs + Watts | Authentic work + product direction + reframing |
+| `editing` | Rubin + Rams + Feynman | Essence + clarity + comprehension test |
+| `product-vision` | Jobs + Rams + Torvalds | Integrated experience + user need + feasibility |
+| `launch` | Jobs + Musashi + Machiavelli | Story + timing + incentives |
+| `creator-product` | Jobs + Rubin + Karpathy | Packaging + authenticity + AI capability |
+| `invention` | Leonardo + Ada + Feynman | Observation + formalization + empirical testing |
+| `prototype` | Leonardo + Torvalds + Karpathy | Sketch + build + empirical iteration |
+| `language-learning` | Krashen + Kahneman + Feynman | Acquisition + learning bias + reality check |
+| `learn-in-public` | Krashen + Leonardo + Rubin | Input + visible learning + authentic expression |
+| `english-content` | Krashen + Jobs + Rams | Acquisition value + content promise + viewer clarity |
 
 </details>
 
@@ -183,7 +207,7 @@ A single LLM gives you one reasoning path dressed up as confidence. Ask it a har
 <summary><strong>Council Profiles</strong> — pre-built panels for different needs</summary>
 
 ### `classic` (default)
-All 18 members with domain triads above. Best for broad deliberation.
+All 22 members with domain triads above. Best for broad deliberation.
 
 ### `exploration-orthogonal`
 12-member panel for discovery and "unknown unknowns" reduction:
@@ -194,6 +218,11 @@ All 18 members with domain triads above. Best for broad deliberation.
 5-member panel for fast decision-to-action:
 - Torvalds, Feynman, Sun Tzu, Aurelius, Ada
 - Profile triads: `ship-now`, `launch-strategy`, `stability`
+
+### `ai-creator-learner`
+8-member panel for a content-production loop from comprehensible English input through working artifact and audience clarity:
+- `karpathy`, `torvalds`, `feynman`, `rubin`, `jobs`, `leonardo`, `krashen`, `rams`
+- Loop: comprehensible English input → observation and visual synthesis → AI understanding → working artifact → authentic story → packaging → audience clarity
 
 </details>
 
@@ -265,7 +294,7 @@ Full mode runs 7 steps: provider routing → problem restate gate → independen
 
 ## Installation
 
-Installs 18 council agents plus skill files for Claude and/or Codex.
+Installs 22 council agents plus skill files for Claude and/or Codex.
 
 ```bash
 ./install.sh                                   # Claude install (default)
