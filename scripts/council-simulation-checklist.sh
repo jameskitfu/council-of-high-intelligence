@@ -11,6 +11,33 @@ pass() { echo "[PASS] $1"; }
 fail() { echo "[FAIL] $1"; exit 1; }
 warn() { echo "[WARN] $1"; }
 
+markdown_section() {
+  local source_file="$1"
+  local heading_pattern="$2"
+  awk -v heading_pattern="${heading_pattern}" '
+    $0 ~ heading_pattern { in_section = 1; next }
+    in_section && /^## / { exit }
+    in_section { print }
+  ' "${source_file}"
+}
+
+single_roster_code_span() {
+  local source_file="$1"
+  local roster_section
+  local span_count
+
+  roster_section=$(markdown_section "${source_file}" '^## Member Roster$')
+  span_count=$(printf '%s\n' "${roster_section}" | grep -Ec '^`[^`]+`$' || true)
+  [[ "${span_count}" -eq 1 ]] || return 1
+  printf '%s\n' "${roster_section}" | grep -E '^`[^`]+`$'
+}
+
+roster_has_member_token() {
+  local roster="$1"
+  local member_name="$2"
+  printf '%s\n' "${roster}" | grep -Eq "(^|[[:space:],])${member_name}([[:space:],]|$)"
+}
+
 # --- File existence checks ---
 
 [[ -f "SKILL.md" ]] || fail "SKILL.md is missing"
@@ -118,13 +145,25 @@ platform_files=(SKILL.md SKILL.codex.md SKILL.gemini.md)
 creator_learner_members=(jobs rubin leonardo krashen)
 creator_learner_triads=(creative creator editing product-vision launch creator-product invention prototype language-learning learn-in-public english-content)
 
+skill_member_roster=$(markdown_section SKILL.md '^## The [0-9]+ Council Members$')
+[[ -n "${skill_member_roster}" ]] || fail "Council member roster section missing in SKILL.md"
+for member_name in "${creator_learner_members[@]}"; do
+  grep -Fq "\`council-${member_name}\`" <<<"${skill_member_roster}" || fail "Creator-learner member '${member_name}' missing from the SKILL.md member roster"
+done
+
+for platform_file in SKILL.codex.md SKILL.gemini.md; do
+  if ! member_roster_span=$(single_roster_code_span "${platform_file}"); then
+    fail "Single shared Member Roster code span missing in ${platform_file}"
+  fi
+  member_roster_tokens=${member_roster_span#\`}
+  member_roster_tokens=${member_roster_tokens%\`}
+  for member_name in "${creator_learner_members[@]}"; do
+    roster_has_member_token "${member_roster_tokens}" "${member_name}" || fail "Creator-learner member '${member_name}' missing from the ${platform_file} member roster"
+  done
+done
+
 for platform_file in "${platform_files[@]}"; do
   [[ -f "${platform_file}" ]] || fail "${platform_file} is missing"
-  for member_name in "${creator_learner_members[@]}"; do
-    if ! grep -Fq "\`${member_name}\`" "${platform_file}" && ! grep -Fq "\`council-${member_name}\`" "${platform_file}"; then
-      fail "Creator-learner member '${member_name}' missing in ${platform_file}"
-    fi
-  done
   grep -q "ai-creator-learner" "${platform_file}" || fail "ai-creator-learner profile missing in ${platform_file}"
   for triad_name in "${creator_learner_triads[@]}"; do
     grep -Fq "\`${triad_name}\`" "${platform_file}" || fail "Creator-learner triad '${triad_name}' missing in ${platform_file}"
