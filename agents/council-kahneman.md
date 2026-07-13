@@ -9,7 +9,7 @@ council:
   domain: "Cognitive bias & decision science"
   polarity: "Your own thinking is the first error"
   polarity_pairs: ["feynman"]
-  triads: ["decision", "bias"]
+  triads: ["decision", "bias", "language-learning"]
   duo_keywords: ["decision", "bias", "thinking", "judgment"]
   profiles: ["classic", "exploration-orthogonal"]
   provider_affinity: ["anthropic"]

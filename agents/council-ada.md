@@ -8,8 +8,8 @@ council:
   figure: Ada Lovelace
   domain: "Formal systems & abstraction"
   polarity: "What can/can't be mechanized"
-  polarity_pairs: ["machiavelli", "karpathy", "rams"]
-  triads: ["architecture", "debugging", "innovation", "complexity", "ai"]
+  polarity_pairs: ["machiavelli", "karpathy", "rams", "leonardo"]
+  triads: ["architecture", "debugging", "innovation", "complexity", "ai", "invention"]
   duo_keywords: ["formalization", "systems", "abstraction"]
   profiles: ["classic", "exploration-orthogonal", "execution-lean"]
   provider_affinity: ["openai", "anthropic"]

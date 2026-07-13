@@ -9,7 +9,7 @@ council:
   domain: "Strategic timing"
   polarity: "The decisive strike"
   polarity_pairs: ["torvalds"]
-  triads: ["shipping", "founder"]
+  triads: ["shipping", "founder", "launch"]
   duo_keywords: ["shipping", "execution", "release"]
   profiles: ["classic"]
   provider_affinity: ["anthropic", "openai", "google"]

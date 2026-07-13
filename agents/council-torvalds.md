@@ -8,10 +8,10 @@ council:
   figure: Linus Torvalds
   domain: "Pragmatic engineering"
   polarity: "Ship it or shut up"
-  polarity_pairs: ["watts", "musashi", "meadows"]
-  triads: ["shipping", "product", "founder", "ai-product", "design"]
+  polarity_pairs: ["watts", "musashi", "meadows", "jobs", "rubin"]
+  triads: ["shipping", "product", "founder", "ai-product", "design", "product-vision", "prototype"]
   duo_keywords: ["shipping", "execution", "release", "engineering", "theory", "pragmatism"]
-  profiles: ["classic", "exploration-orthogonal", "execution-lean"]
+  profiles: ["classic", "exploration-orthogonal", "execution-lean", "ai-creator-learner"]
   provider_affinity: ["openai", "anthropic"]
 ---
 

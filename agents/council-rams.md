@@ -8,10 +8,10 @@ council:
   figure: Dieter Rams
   domain: "User-centered design"
   polarity: "Less, but better — the user decides"
-  polarity_pairs: ["ada"]
-  triads: ["design"]
+  polarity_pairs: ["ada", "jobs"]
+  triads: ["design", "creative", "editing", "product-vision", "english-content"]
   duo_keywords: ["design", "user", "usability", "ux"]
-  profiles: ["classic"]
+  profiles: ["classic", "ai-creator-learner"]
   provider_affinity: ["openai", "anthropic"]
 ---
 

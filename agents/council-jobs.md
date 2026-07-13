@@ -9,7 +9,7 @@ council:
   domain: "Product taste & integrated experience"
   polarity: "Shape the whole experience around one clear promise"
   polarity_pairs: ["rubin", "rams", "torvalds"]
-  triads: ["product-vision", "launch", "creator-product"]
+  triads: ["creator", "product-vision", "launch", "creator-product", "english-content"]
   duo_keywords: ["product", "experience", "packaging", "launch", "taste"]
   profiles: ["classic", "ai-creator-learner"]
   provider_affinity: ["anthropic", "openai"]

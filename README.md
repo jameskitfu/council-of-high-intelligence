@@ -71,6 +71,22 @@ Then in Codex:
 /council --duo Should we use microservices or monolith?
 ```
 
+### Gemini CLI
+
+```bash
+git clone https://github.com/0xNyk/council-of-high-intelligence.git
+cd council-of-high-intelligence
+./install.sh --gemini
+```
+
+Then in Gemini CLI:
+
+```
+/council Should we open-source our agent framework?
+/council --quick Should we add caching here?
+/council --duo Should we use microservices or monolith?
+```
+
 ## Why This Works
 
 A single LLM gives you one reasoning path dressed up as confidence. Ask it a hard question and you get a fluent, structured, wrong answer. The council gives you structured disagreement instead:
@@ -294,14 +310,17 @@ Full mode runs 7 steps: provider routing → problem restate gate → independen
 
 ## Installation
 
-Installs 22 council agents plus skill files for Claude and/or Codex.
+Installs 22 council agents plus skill files for Claude, Codex, and/or Gemini CLI.
 
 ```bash
 ./install.sh                                   # Claude install (default)
 ./install.sh --codex                           # Claude + Codex skill install
 ./install.sh --codex-only                      # Codex-only install
+./install.sh --gemini                          # Claude + Gemini CLI skill install
+./install.sh --gemini-only                     # Gemini-only install
 ./install.sh --claude-dir /path/to/.claude     # Non-default Claude config directory
 ./install.sh --codex-dir /path/to/.codex       # Non-default Codex config directory
+./install.sh --gemini-dir /path/to/.gemini     # Non-default Gemini config directory
 ./install.sh --dry-run                          # Preview without writing
 ./install.sh --copy-configs                     # Also install model routing templates
 ```
@@ -312,6 +331,7 @@ Restart your target client(s) after installing. Run `./scripts/council-simulatio
 
 - [Claude Code](https://claude.ai/claude-code) CLI (required for Claude usage)
 - [Codex](https://github.com/openai/codex) (required for Codex skill usage)
+- [Gemini CLI](https://github.com/google-gemini/gemini-cli) (required for Gemini skill usage)
 - Agent/subagent support in your client (enabled by default)
 
 **Optional providers** (auto-detected for multi-provider routing):

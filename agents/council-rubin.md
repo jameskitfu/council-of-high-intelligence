@@ -9,7 +9,7 @@ council:
   domain: "Creative direction & artistic truth"
   polarity: "Listen to what the work wants to become"
   polarity_pairs: ["jobs", "torvalds"]
-  triads: ["creative", "creator", "editing", "creator-product"]
+  triads: ["creative", "creator", "editing", "creator-product", "learn-in-public"]
   duo_keywords: ["creative", "creator", "editing", "authenticity", "art"]
   profiles: ["classic", "ai-creator-learner"]
   provider_affinity: ["anthropic", "google"]

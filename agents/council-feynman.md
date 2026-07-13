@@ -8,10 +8,10 @@ council:
   figure: Feynman
   domain: "First-principles debugging"
   polarity: "Refuses unexplained complexity"
-  polarity_pairs: ["socrates", "kahneman"]
-  triads: ["architecture", "debugging", "risk", "shipping"]
+  polarity_pairs: ["socrates", "kahneman", "krashen"]
+  triads: ["architecture", "debugging", "risk", "shipping", "editing", "invention", "language-learning"]
   duo_keywords: ["decision", "bias", "thinking", "judgment"]
-  profiles: ["classic", "exploration-orthogonal", "execution-lean"]
+  profiles: ["classic", "exploration-orthogonal", "execution-lean", "ai-creator-learner"]
   provider_affinity: ["openai", "anthropic"]
 ---
 

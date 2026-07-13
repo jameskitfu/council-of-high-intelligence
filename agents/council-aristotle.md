@@ -8,10 +8,10 @@ council:
   figure: Aristotle
   domain: "Categorization & structure"
   polarity: "Classifies everything"
-  polarity_pairs: ["lao-tzu", "munger"]
+  polarity_pairs: ["lao-tzu", "munger", "leonardo"]
   triads: ["architecture", "innovation", "complexity", "systems"]
   duo_keywords: ["architecture", "structure", "categories"]
-  profiles: ["classic", "exploration-orthogonal"]
+  profiles: ["classic"]
   provider_affinity: ["anthropic", "openai", "google"]
 ---
 

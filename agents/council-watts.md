@@ -9,7 +9,7 @@ council:
   domain: "Perspective & reframing"
   polarity: "Dissolves false problems"
   polarity_pairs: ["torvalds", "socrates"]
-  triads: ["product", "design", "bias"]
+  triads: ["product", "design", "bias", "creator"]
   duo_keywords: ["framing", "purpose", "meaning", "engineering", "theory", "pragmatism"]
   profiles: ["classic"]
   provider_affinity: ["anthropic"]

@@ -9,9 +9,9 @@ council:
   domain: "Neural network intuition & empirical ML"
   polarity: "How models actually learn and fail"
   polarity_pairs: ["sutskever", "ada", "taleb"]
-  triads: ["ai", "ai-product"]
+  triads: ["ai", "ai-product", "creator-product", "prototype"]
   duo_keywords: ["ai", "ml", "neural", "model", "training"]
-  profiles: ["classic", "exploration-orthogonal"]
+  profiles: ["classic", "exploration-orthogonal", "ai-creator-learner"]
   provider_affinity: ["openai", "anthropic"]
 ---
 

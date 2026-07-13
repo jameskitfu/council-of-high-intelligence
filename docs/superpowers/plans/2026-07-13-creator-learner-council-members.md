@@ -51,8 +51,8 @@ Use the exact metadata and boundaries below:
 
 | ID | Figure | Domain | Model | Polarity | Pairs | Triads | Profile | Affinity |
 |---|---|---|---|---|---|---|---|---|
-| `jobs` | Steve Jobs | Product taste & integrated experience | opus | Shape the whole experience around one clear promise | rubin, rams, torvalds | product-vision, launch, creator-product | classic, ai-creator-learner | anthropic, openai |
-| `rubin` | Rick Rubin | Creative direction & artistic truth | opus | Listen to what the work wants to become | jobs, torvalds | creative, creator, editing, creator-product | classic, ai-creator-learner | anthropic, google |
+| `jobs` | Steve Jobs | Product taste & integrated experience | opus | Shape the whole experience around one clear promise | rubin, rams, torvalds | creator, product-vision, launch, creator-product, english-content | classic, ai-creator-learner | anthropic, openai |
+| `rubin` | Rick Rubin | Creative direction & artistic truth | opus | Listen to what the work wants to become | jobs, torvalds | creative, creator, editing, creator-product, learn-in-public | classic, ai-creator-learner | anthropic, google |
 | `leonardo` | Leonardo da Vinci | Observational synthesis & visual invention | opus | See it, sketch it, then understand it | aristotle, ada | creative, invention, prototype, learn-in-public | classic, ai-creator-learner | google, anthropic, openai |
 | `krashen` | Stephen Krashen | Language acquisition & comprehensible input | sonnet | Acquire through meaningful input before forcing output | feynman | language-learning, learn-in-public, english-content | classic, ai-creator-learner | google, anthropic |
 

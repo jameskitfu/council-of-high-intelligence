@@ -11,33 +11,6 @@ pass() { echo "[PASS] $1"; }
 fail() { echo "[FAIL] $1"; exit 1; }
 warn() { echo "[WARN] $1"; }
 
-markdown_section() {
-  local source_file="$1"
-  local heading_pattern="$2"
-  awk -v heading_pattern="${heading_pattern}" '
-    $0 ~ heading_pattern { in_section = 1; next }
-    in_section && /^## / { exit }
-    in_section { print }
-  ' "${source_file}"
-}
-
-single_roster_code_span() {
-  local source_file="$1"
-  local roster_section
-  local span_count
-
-  roster_section=$(markdown_section "${source_file}" '^## Member Roster$')
-  span_count=$(printf '%s\n' "${roster_section}" | grep -Ec '^`[^`]+`$' || true)
-  [[ "${span_count}" -eq 1 ]] || return 1
-  printf '%s\n' "${roster_section}" | grep -E '^`[^`]+`$'
-}
-
-roster_has_member_token() {
-  local roster="$1"
-  local member_name="$2"
-  printf '%s\n' "${roster}" | grep -Eq "(^|[[:space:],])${member_name}([[:space:],]|$)"
-}
-
 # --- File existence checks ---
 
 [[ -f "SKILL.md" ]] || fail "SKILL.md is missing"
@@ -140,87 +113,371 @@ pass "Session Metadata schema wired in SKILL.md"
 grep -q "Session Metadata\|session metadata\|session_metadata" SKILL.codex.md || fail "Session Metadata missing in SKILL.codex.md (issue #7)"
 pass "Session Metadata referenced in SKILL.codex.md"
 
-# Creator-learner platform integration
-platform_files=(SKILL.md SKILL.codex.md SKILL.gemini.md)
-creator_learner_members=(jobs rubin leonardo krashen)
-creator_learner_triads=(creative creator editing product-vision launch creator-product invention prototype language-learning learn-in-public english-content)
+# --- Exact council graph and schema validation ---
 
-skill_member_roster=$(markdown_section SKILL.md '^## The [0-9]+ Council Members$')
-[[ -n "${skill_member_roster}" ]] || fail "Council member roster section missing in SKILL.md"
-for member_name in "${creator_learner_members[@]}"; do
-  grep -Fq "\`council-${member_name}\`" <<<"${skill_member_roster}" || fail "Creator-learner member '${member_name}' missing from the SKILL.md member roster"
-done
+if ! python3 - <<'PY'
+from pathlib import Path
+import ast
+import re
 
-for platform_file in SKILL.codex.md SKILL.gemini.md; do
-  if ! member_roster_span=$(single_roster_code_span "${platform_file}"); then
-    fail "Single shared Member Roster code span missing in ${platform_file}"
-  fi
-  member_roster_tokens=${member_roster_span#\`}
-  member_roster_tokens=${member_roster_tokens%\`}
-  for member_name in "${creator_learner_members[@]}"; do
-    roster_has_member_token "${member_roster_tokens}" "${member_name}" || fail "Creator-learner member '${member_name}' missing from the ${platform_file} member roster"
-  done
-done
+EXPECTED_IDS = {
+    "ada", "aristotle", "aurelius", "feynman", "jobs", "kahneman",
+    "karpathy", "krashen", "lao-tzu", "leonardo", "machiavelli",
+    "meadows", "munger", "musashi", "rams", "rubin", "socrates",
+    "sun-tzu", "sutskever", "taleb", "torvalds", "watts",
+}
+EXPECTED_NEW_TRIADS = {
+    "creative": {"rubin", "leonardo", "rams"},
+    "creator": {"rubin", "jobs", "watts"},
+    "editing": {"rubin", "rams", "feynman"},
+    "product-vision": {"jobs", "rams", "torvalds"},
+    "launch": {"jobs", "musashi", "machiavelli"},
+    "creator-product": {"jobs", "rubin", "karpathy"},
+    "invention": {"leonardo", "ada", "feynman"},
+    "prototype": {"leonardo", "torvalds", "karpathy"},
+    "language-learning": {"krashen", "kahneman", "feynman"},
+    "learn-in-public": {"krashen", "leonardo", "rubin"},
+    "english-content": {"krashen", "jobs", "rams"},
+}
+EXPECTED_PROFILES = {
+    "classic": EXPECTED_IDS,
+    "exploration-orthogonal": {
+        "socrates", "feynman", "sun-tzu", "machiavelli", "ada",
+        "lao-tzu", "aurelius", "torvalds", "karpathy", "sutskever",
+        "kahneman", "meadows",
+    },
+    "execution-lean": {"torvalds", "feynman", "sun-tzu", "aurelius", "ada"},
+    "ai-creator-learner": {
+        "karpathy", "torvalds", "feynman", "rubin", "jobs", "leonardo",
+        "krashen", "rams",
+    },
+}
+REQUIRED_HEADINGS = (
+    "Identity",
+    "Analytical Method",
+    "What You See That Others Miss",
+    "What You Tend to Miss",
+    "When Deliberating in Council",
+    "Output Format (Council Round 2)",
+    "Output Format (Standalone)",
+)
 
-for platform_file in "${platform_files[@]}"; do
-  [[ -f "${platform_file}" ]] || fail "${platform_file} is missing"
-  grep -q "ai-creator-learner" "${platform_file}" || fail "ai-creator-learner profile missing in ${platform_file}"
-  for triad_name in "${creator_learner_triads[@]}"; do
-    grep -Fq "\`${triad_name}\`" "${platform_file}" || fail "Creator-learner triad '${triad_name}' missing in ${platform_file}"
-  done
-done
-pass "Creator-learner members, profile, and triads wired across all platform coordinators"
+errors = []
 
-# --- Agent structure checks ---
 
-required_sections=("Identity" "Grounding Protocol" "Analytical Method" "What You See" "What You Tend to Miss" "When Deliberating" "Output Format (Council Round 2)" "Output Format (Standalone)")
+def describe(values):
+    return ", ".join(sorted(values)) or "<none>"
 
-agent_structure_ok=true
-for agent_file in agents/council-*.md; do
-  agent_name=$(basename "${agent_file}" .md)
-  for section in "${required_sections[@]}"; do
-    if ! grep -q "## ${section}" "${agent_file}" 2>/dev/null; then
-      # Some sections use slightly different headers, try partial match
-      section_word=$(echo "${section}" | awk '{print $1}')
-      if ! grep -qi "${section_word}" "${agent_file}" 2>/dev/null; then
-        warn "${agent_name}: missing section '${section}'"
-        agent_structure_ok=false
-      fi
-    fi
-  done
-done
 
-if [[ "${agent_structure_ok}" == true ]]; then
-  pass "All agents have consistent section structure"
-else
-  warn "Some agents have inconsistent section structure (see warnings above)"
+def compare_sets(label, actual, expected):
+    if actual != expected:
+        errors.append(
+            f"{label}: missing [{describe(expected - actual)}]; "
+            f"unexpected [{describe(actual - expected)}]"
+        )
+
+
+def markdown_section(text, heading):
+    lines = text.splitlines()
+    marker = f"## {heading}"
+    try:
+        start = lines.index(marker) + 1
+    except ValueError:
+        errors.append(f"missing section {marker!r}")
+        return []
+    end = next((index for index in range(start, len(lines)) if lines[index].startswith("## ")), len(lines))
+    return lines[start:end]
+
+
+def markdown_subsection(text, heading):
+    lines = text.splitlines()
+    pattern = re.compile(rf"^### `{re.escape(heading)}`(?:\s|$)")
+    matches = [index for index, line in enumerate(lines) if pattern.match(line)]
+    if len(matches) != 1:
+        errors.append(f"expected one profile subsection for {heading!r}, found {len(matches)}")
+        return []
+    start = matches[0] + 1
+    end = next((index for index in range(start, len(lines)) if lines[index].startswith("### ")), len(lines))
+    return lines[start:end]
+
+
+def table_rows(lines):
+    rows = []
+    for line in lines:
+        if not line.startswith("|"):
+            continue
+        cells = [cell.strip() for cell in line.strip().strip("|").split("|")]
+        if cells and re.fullmatch(r"`[^`]+`", cells[0]):
+            rows.append(cells)
+    return rows
+
+
+def parse_frontmatter(path):
+    text = path.read_text()
+    parts = text.split("---", 2)
+    if len(parts) != 3 or parts[0].strip():
+        errors.append(f"{path}: malformed YAML frontmatter delimiters")
+        return text, {}
+
+    council = {}
+    in_council = False
+    for line in parts[1].splitlines():
+        if line == "council:":
+            in_council = True
+            continue
+        if in_council and not line.startswith("  "):
+            in_council = False
+        if not in_council:
+            continue
+        match = re.match(r"^  ([a-z_]+):\s*(.*)$", line)
+        if not match:
+            continue
+        key, raw_value = match.groups()
+        if key in {"polarity_pairs", "triads", "profiles", "provider_affinity"}:
+            try:
+                value = ast.literal_eval(raw_value)
+            except (SyntaxError, ValueError):
+                errors.append(f"{path}: council.{key} is not a valid inline string array")
+                continue
+            if not isinstance(value, list) or any(not isinstance(item, str) for item in value):
+                errors.append(f"{path}: council.{key} must be an inline string array")
+                continue
+            if len(value) != len(set(value)):
+                errors.append(f"{path}: council.{key} contains duplicate entries")
+            council[key] = value
+        else:
+            council[key] = raw_value
+    return text, council
+
+
+agent_paths = sorted(Path("agents").glob("council-*.md"))
+actual_ids = {path.stem[len("council-"):] for path in agent_paths}
+compare_sets("agent ID set", actual_ids, EXPECTED_IDS)
+
+agent_metadata = {}
+for path in agent_paths:
+    agent_id = path.stem[len("council-"):]
+    text, council = parse_frontmatter(path)
+    agent_metadata[agent_id] = council
+
+    headings = [line[3:] for line in text.splitlines() if line.startswith("## ")]
+    for required in REQUIRED_HEADINGS:
+        count = headings.count(required)
+        if count != 1:
+            errors.append(f"{path}: expected exact heading '## {required}' once, found {count}")
+    grounding = [heading for heading in headings if heading == "Grounding Protocol" or heading.startswith("Grounding Protocol — ")]
+    if len(grounding) != 1:
+        errors.append(f"{path}: expected one exact Grounding Protocol heading, found {len(grounding)}")
+    if headings.count("Identity") == 1 and len(grounding) == 1 and headings.count("Analytical Method") == 1:
+        if not headings.index("Identity") < headings.index(grounding[0]) < headings.index("Analytical Method"):
+            errors.append(f"{path}: Grounding Protocol must appear after Identity and before Analytical Method")
+
+    affinity = council.get("provider_affinity")
+    if not isinstance(affinity, list) or not affinity:
+        errors.append(f"{path}: council.provider_affinity is missing from YAML frontmatter or empty")
+
+skill_text = Path("SKILL.md").read_text()
+skill_roster_rows = table_rows(markdown_section(skill_text, "The 22 Council Members"))
+figure_to_id = {}
+skill_roster = set()
+for row in skill_roster_rows:
+    if len(row) < 2:
+        continue
+    match = re.fullmatch(r"`council-([^`]+)`", row[0])
+    if not match:
+        continue
+    agent_id = match.group(1)
+    skill_roster.add(agent_id)
+    figure_to_id[row[1].casefold()] = agent_id
+compare_sets("SKILL.md roster", skill_roster, EXPECTED_IDS)
+
+aliases = {agent_id.casefold(): agent_id for agent_id in EXPECTED_IDS}
+aliases.update(figure_to_id)
+for figure, agent_id in list(figure_to_id.items()):
+    last_name = figure.split()[-1]
+    if last_name not in aliases:
+        aliases[last_name] = agent_id
+
+
+def resolve_member(raw, label):
+    token = raw.strip().strip("`")
+    agent_id = aliases.get(token.casefold())
+    if agent_id is None:
+        errors.append(f"{label}: unknown member {token!r}")
+    return agent_id
+
+
+canonical_triads = {}
+for row in table_rows(markdown_section(skill_text, "Pre-defined Triads")):
+    if len(row) < 2:
+        continue
+    triad = row[0].strip("`")
+    members = {
+        member_id
+        for member in row[1].split("+")
+        if (member_id := resolve_member(member, f"SKILL.md triad {triad}")) is not None
+    }
+    if triad in canonical_triads:
+        errors.append(f"SKILL.md triad {triad!r} is duplicated")
+    canonical_triads[triad] = members
+
+for triad, expected_members in EXPECTED_NEW_TRIADS.items():
+    compare_sets(f"SKILL.md new triad {triad}", canonical_triads.get(triad, set()), expected_members)
+
+expected_triads_by_member = {agent_id: set() for agent_id in EXPECTED_IDS}
+for triad, members in canonical_triads.items():
+    for member in members:
+        expected_triads_by_member[member].add(triad)
+
+expected_profiles_by_member = {agent_id: set() for agent_id in EXPECTED_IDS}
+for profile, members in EXPECTED_PROFILES.items():
+    for member in members:
+        expected_profiles_by_member[member].add(profile)
+
+for agent_id in sorted(EXPECTED_IDS & actual_ids):
+    council = agent_metadata[agent_id]
+    actual_triads = set(council.get("triads", []))
+    actual_profiles = set(council.get("profiles", []))
+    compare_sets(f"{agent_id} frontmatter triads", actual_triads, expected_triads_by_member[agent_id])
+    compare_sets(f"{agent_id} frontmatter profiles", actual_profiles, expected_profiles_by_member[agent_id])
+
+for agent_id in sorted(EXPECTED_IDS & actual_ids):
+    pairs = agent_metadata[agent_id].get("polarity_pairs", [])
+    if not isinstance(pairs, list):
+        errors.append(f"{agent_id}: council.polarity_pairs is missing")
+        continue
+    for peer in pairs:
+        if peer not in EXPECTED_IDS:
+            errors.append(f"{agent_id}: polarity pair points to unknown agent {peer!r}")
+        elif peer == agent_id:
+            errors.append(f"{agent_id}: polarity pair cannot point to itself")
+        elif agent_id not in agent_metadata.get(peer, {}).get("polarity_pairs", []):
+            errors.append(f"one-way polarity pair: {agent_id} -> {peer}, but {peer} does not point to {agent_id}")
+
+
+def parse_compact_roster(text, platform):
+    section = markdown_section(text, "Member Roster")
+    spans = [re.fullmatch(r"`([^`]+)`", line.strip()) for line in section]
+    values = [match.group(1) for match in spans if match]
+    if len(values) != 1:
+        errors.append(f"{platform}: expected one Member Roster code span, found {len(values)}")
+        return set()
+    return {token.strip() for token in values[0].split(",") if token.strip()}
+
+
+def parse_compact_triads(text, platform):
+    triads = {}
+    for row in table_rows(markdown_section(text, "Triads")):
+        if len(row) < 2:
+            continue
+        triad = row[0].strip("`")
+        members = {token.strip().strip("`") for token in row[1].split(",") if token.strip()}
+        if triad in triads:
+            errors.append(f"{platform}: triad {triad!r} is duplicated")
+        triads[triad] = members
+    return triads
+
+
+def parse_skill_profiles(text):
+    profiles = {}
+    for profile in EXPECTED_PROFILES:
+        block = markdown_subsection(text, profile)
+        joined = "\n".join(block)
+        if profile == "classic":
+            count_match = re.search(r"\bAll (\d+) members\b", joined)
+            if not count_match or int(count_match.group(1)) != len(EXPECTED_IDS):
+                errors.append("SKILL.md classic profile must state All 22 members")
+            profiles[profile] = EXPECTED_IDS if count_match else set()
+            continue
+        members_match = re.search(r"^\*\*Members\*\*:\s*(.+)$", joined, re.MULTILINE)
+        if not members_match:
+            errors.append(f"SKILL.md profile {profile!r} is missing its Members line")
+            profiles[profile] = set()
+            continue
+        profiles[profile] = {
+            member_id
+            for member in members_match.group(1).split(",")
+            if (member_id := resolve_member(member, f"SKILL.md profile {profile}")) is not None
+        }
+    return profiles
+
+
+def parse_compact_profiles(text, platform):
+    profiles = {}
+    for line in markdown_section(text, "Profiles"):
+        match = re.match(r"^- `([^`]+)`: (.+)$", line)
+        if not match:
+            continue
+        profile, raw_members = match.groups()
+        if raw_members == "all 22 members":
+            members = EXPECTED_IDS
+        else:
+            members = {token.strip().strip("`") for token in raw_members.split(",") if token.strip()}
+        profiles[profile] = members
+    compare_sets(f"{platform} profile ID set", set(profiles), set(EXPECTED_PROFILES))
+    return profiles
+
+
+coordinator_texts = {
+    "SKILL.md": skill_text,
+    "SKILL.codex.md": Path("SKILL.codex.md").read_text(),
+    "SKILL.gemini.md": Path("SKILL.gemini.md").read_text(),
+}
+coordinator_rosters = {
+    "SKILL.md": skill_roster,
+    "SKILL.codex.md": parse_compact_roster(coordinator_texts["SKILL.codex.md"], "SKILL.codex.md"),
+    "SKILL.gemini.md": parse_compact_roster(coordinator_texts["SKILL.gemini.md"], "SKILL.gemini.md"),
+}
+for platform, roster in coordinator_rosters.items():
+    compare_sets(f"{platform} roster", roster, EXPECTED_IDS)
+
+coordinator_triads = {
+    "SKILL.md": canonical_triads,
+    "SKILL.codex.md": parse_compact_triads(coordinator_texts["SKILL.codex.md"], "SKILL.codex.md"),
+    "SKILL.gemini.md": parse_compact_triads(coordinator_texts["SKILL.gemini.md"], "SKILL.gemini.md"),
+}
+for platform, triads in coordinator_triads.items():
+    compare_sets(f"{platform} triad ID set", set(triads), set(canonical_triads))
+    for triad, canonical_members in canonical_triads.items():
+        compare_sets(f"{platform} triad {triad}", triads.get(triad, set()), canonical_members)
+
+coordinator_profiles = {
+    "SKILL.md": parse_skill_profiles(skill_text),
+    "SKILL.codex.md": parse_compact_profiles(coordinator_texts["SKILL.codex.md"], "SKILL.codex.md"),
+    "SKILL.gemini.md": parse_compact_profiles(coordinator_texts["SKILL.gemini.md"], "SKILL.gemini.md"),
+}
+for platform, profiles in coordinator_profiles.items():
+    compare_sets(f"{platform} profile ID set", set(profiles), set(EXPECTED_PROFILES))
+    for profile, expected_members in EXPECTED_PROFILES.items():
+        compare_sets(f"{platform} profile {profile}", profiles.get(profile, set()), expected_members)
+
+readme_count_markers = {
+    "README.md": ("22 AI personas", "members-22", "## The 22 Council Members", "Installs 22 council agents"),
+    "README.zh-CN.md": ("22 位 AI 人格", "members-22", "## 22 位议会成员", "安装 22 位议会成员"),
+}
+for readme_name, count_markers in readme_count_markers.items():
+    readme = Path(readme_name).read_text()
+    for marker in count_markers:
+        if marker not in readme:
+            errors.append(f"{readme_name}: current 22-member marker {marker!r} is missing")
+    for agent_id in ("jobs", "rubin", "leonardo", "krashen"):
+        if f"`council-{agent_id}`" not in readme:
+            errors.append(f"{readme_name}: council-{agent_id} is missing")
+    if "ai-creator-learner" not in readme:
+        errors.append(f"{readme_name}: ai-creator-learner is missing")
+
+if "22 member personas" not in Path("CLAUDE.md").read_text():
+    errors.append("CLAUDE.md must state 22 member personas")
+
+if errors:
+    for error in errors:
+        print(f"[FAIL] {error}")
+    raise SystemExit(1)
+PY
+then
+  fail "Exact council graph validation failed"
 fi
-
-# --- Grounding protocol placement check ---
-
-grounding_early=true
-for agent_file in agents/council-*.md; do
-  agent_name=$(basename "${agent_file}" .md)
-  grounding_line=$(grep -n "## Grounding Protocol" "${agent_file}" 2>/dev/null | head -1 | cut -d: -f1 || echo "999")
-  method_line=$(grep -n "## Analytical Method" "${agent_file}" 2>/dev/null | head -1 | cut -d: -f1 || echo "0")
-  if [[ "${grounding_line}" -gt "${method_line}" ]] && [[ "${method_line}" -gt 0 ]]; then
-    warn "${agent_name}: Grounding Protocol appears after Analytical Method (should be before)"
-    grounding_early=false
-  fi
-done
-
-if [[ "${grounding_early}" == true ]]; then
-  pass "Grounding protocols placed before Analytical Method in all agents"
-fi
-
-# --- Triad member validation ---
-
-for member_name in aristotle socrates feynman ada sun-tzu machiavelli aurelius lao-tzu torvalds musashi watts karpathy sutskever kahneman meadows munger taleb rams jobs rubin leonardo krashen; do
-  if [[ ! -f "agents/council-${member_name}.md" ]]; then
-    fail "Missing agent file for triad member: council-${member_name}.md"
-  fi
-done
-pass "All triad member agent files present"
+pass "Exact 22-member council graph, schemas, coordinators, profiles, and docs validated"
 
 # --- Verdict template dedup check ---
 
@@ -253,18 +510,6 @@ pass "--no-auto-route flag documented in SKILL.md"
 
 grep -q -- "--dry-route" SKILL.md || fail "--dry-route flag missing in SKILL.md"
 pass "--dry-route flag documented in SKILL.md"
-
-affinity_count=0
-for agent_file in agents/council-*.md; do
-  if grep -q "provider_affinity" "$agent_file" 2>/dev/null; then
-    ((affinity_count+=1))
-  fi
-done
-if [[ "$affinity_count" -eq "$agent_count" ]]; then
-  pass "All agents have provider_affinity in frontmatter"
-else
-  warn "Only ${affinity_count}/${agent_count} agents have provider_affinity"
-fi
 
 # --- Install script checks ---
 

@@ -8,8 +8,8 @@ council:
   figure: Machiavelli
   domain: "Power dynamics & realpolitik"
   polarity: "How actors actually behave"
-  polarity_pairs: ["ada"]
-  triads: ["strategy", "conflict", "product", "ai-product", "economics"]
+  polarity_pairs: ["ada", "sutskever"]
+  triads: ["strategy", "conflict", "product", "ai-product", "economics", "launch"]
   duo_keywords: ["formalization", "systems", "abstraction"]
   profiles: ["classic", "exploration-orthogonal"]
   provider_affinity: ["anthropic", "google"]
