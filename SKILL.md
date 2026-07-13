@@ -127,7 +127,7 @@ Flag priority: `--quick` / `--duo` set the mode. `--full` / `--triad` / `--membe
 | `prototype` | Leonardo + Torvalds + Karpathy | Sketch + build + empirical iteration |
 | `language-learning` | Krashen + Kahneman + Feynman | Acquisition + learning bias + reality check |
 | `learn-in-public` | Krashen + Leonardo + Rubin | Input + visible learning + authentic expression |
-| `english-content` | Krashen + Jobs + Rams | Acquisition value + content promise + viewer clarity |
+| `english-content` | Krashen + Jobs + Rams | Acquisition value + bilingual packaging + audience clarity |
 
 ## Duo Polarity Pairs (for `--duo` mode)
 

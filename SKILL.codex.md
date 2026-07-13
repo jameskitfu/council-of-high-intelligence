@@ -81,6 +81,8 @@ If no panel flag is present, auto-select the best triad from problem context.
 | `learn-in-public` | krashen, leonardo, rubin |
 | `english-content` | krashen, jobs, rams |
 
+Treat `english-content` as the route for requests about publishing separate English and Chinese editions of the same topic, including localized scripts, examples, titles, thumbnails, pacing, and content promises. Keep each edition natural for its audience instead of translating word for word.
+
 ## Profiles
 
 - `classic`: all 22 members

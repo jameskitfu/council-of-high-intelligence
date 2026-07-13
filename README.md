@@ -216,7 +216,7 @@ Normal usage auto-selects a three-member triad. The `--full` flag invokes all 22
 | `prototype` | Leonardo + Torvalds + Karpathy | Sketch + build + empirical iteration | What is the smallest prototype that can test the riskiest assumption? |
 | `language-learning` | Krashen + Kahneman + Feynman | Acquisition + learning bias + reality check | How can I improve my English listening without turning practice into memorization? |
 | `learn-in-public` | Krashen + Leonardo + Rubin | Input + visible learning + authentic expression | How should I document my AI learning journey without pretending to be an expert? |
-| `english-content` | Krashen + Jobs + Rams | Acquisition value + content promise + viewer clarity | How can I make English YouTube videos that learners understand and native viewers still enjoy? |
+| `english-content` | Krashen + Jobs + Rams | Acquisition value + bilingual packaging + audience clarity | How should I produce separate English and Chinese versions of the same YouTube topic so each feels native to its audience? |
 
 </details>
 

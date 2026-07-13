@@ -225,7 +225,7 @@ cd council-of-high-intelligence
 | `prototype` | Leonardo + Torvalds + Karpathy | 描绘 + 构建 + 经验迭代 | 能验证最大风险假设的最小原型是什么？ |
 | `language-learning` | Krashen + Kahneman + Feynman | 习得 + 学习偏差 + 现实检验 | 如何提升英语听力，又不把练习变成死记硬背？ |
 | `learn-in-public` | Krashen + Leonardo + Rubin | 输入 + 公开学习 + 真实表达 | 我应该如何记录 AI 学习过程，同时不假装自己是专家？ |
-| `english-content` | Krashen + Jobs + Rams | 习得价值 + 内容承诺 + 观众清晰度 | 如何制作学习者能听懂、母语观众也愿意看的英语 YouTube 视频？ |
+| `english-content` | Krashen + Jobs + Rams | 习得价值 + 双语版本包装 + 观众清晰度 | 同一个 YouTube 选题应该如何分别制作英文版和中文版，才能让两类观众都觉得自然？ |
 
 </details>
 
