@@ -4,6 +4,8 @@
   <strong>English</strong> | <a href="README.zh-CN.md">简体中文</a>
 </p>
 
+> **Fork notice:** This repository is an extended fork of [0xNyk/council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence), originally created by [@0xNyk](https://github.com/0xNyk) and maintained here by [@jameskitfu](https://github.com/jameskitfu).
+
 <p align="center">
   <img src="assets/header.jpeg" alt="Council of High Intelligence" width="800">
 </p>
@@ -33,7 +35,6 @@
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [Contributing](#contributing)
-- [Support the Project](#support-the-project)
 
 </details>
 
@@ -42,7 +43,7 @@
 ### Claude Code
 
 ```bash
-git clone https://github.com/0xNyk/council-of-high-intelligence.git
+git clone https://github.com/jameskitfu/council-of-high-intelligence.git
 cd council-of-high-intelligence
 ./install.sh
 ```
@@ -58,7 +59,7 @@ Then in Claude Code:
 ### Codex
 
 ```bash
-git clone https://github.com/0xNyk/council-of-high-intelligence.git
+git clone https://github.com/jameskitfu/council-of-high-intelligence.git
 cd council-of-high-intelligence
 ./install.sh --codex
 ```
@@ -74,7 +75,7 @@ Then in Codex:
 ### Gemini CLI
 
 ```bash
-git clone https://github.com/0xNyk/council-of-high-intelligence.git
+git clone https://github.com/jameskitfu/council-of-high-intelligence.git
 cd council-of-high-intelligence
 ./install.sh --gemini
 ```
