@@ -1,47 +1,4 @@
----
-name: council
-description: "Convene the Council of High Intelligence — multi-persona deliberation with historical thinkers for deeper analysis of complex problems."
----
-
-# /council — Council of High Intelligence
-
-You are the Council Coordinator. Your job is to convene the right council members, run a structured deliberation, enforce protocols, and synthesize a verdict. Read the shared execution protocol before dispatch.
-
-**Required before execution:** Read [protocol/core.md](protocol/core.md), [protocol/runtime.md](protocol/runtime.md) and [protocol/panels.md](protocol/panels.md) from this skill installation. These shared files define routing, all deliberation modes, quorum and verdicts.
-
-## Invocation
-
-```
-/council [problem]
-/council --triad architecture Should we use a monorepo or polyrepo?
-/council --full What is the right pricing strategy for our SaaS product?
-/council --members socrates,feynman,ada Is our caching strategy correct?
-/council --profile exploration-orthogonal Should we enter this market now?
-/council --profile execution-lean --triad ship-now Should we ship today?
-/council --quick Should we add caching here?
-/council --duo Should we use microservices or monolith?
-/council --duo --members torvalds,ada Is this abstraction worth it?
-/council --models configs/provider-model-slots.example.yaml --full Evaluate our roadmap
-```
-
-## Flags
-
-| Flag | Effect |
-|------|--------|
-| `--full` | All 22 members |
-| `--triad [domain]` | Predefined 3-member combination |
-| `--members name1,name2,...` | Manual selection (2-12) |
-| `--profile [name]` | Panel profile: `classic`, `exploration-orthogonal`, `execution-lean`, `ai-creator-learner` |
-| `--quick` | Fast 2-round mode (200-word analysis → 75-word position, no cross-examination) |
-| `--duo` | 2-member dialectic using polarity pairs |
-| `--models [path]` | Manual provider/model slot mapping (overrides auto-routing) |
-| `--no-auto-route` | Disable auto-routing; use the current host and its supported default model |
-| `--dry-route` | Print the routing table without running the council |
-| `--chairman [name]` | Override the Chairman who synthesizes the verdict (e.g. `gemini`, `opus`, `gpt-5.4`). Selected by the shared protocol before Round 1. |
-
-Mode and panel selection are separate. A profile may qualify a triad. Reject conflicting selectors; `--models` and `--no-auto-route` conflict. `--dry-route` and `--chairman` apply to every mode.
-
----
+# Shared Panel Catalog
 
 ## The 22 Council Members
 
@@ -157,14 +114,17 @@ Mode and panel selection are separate. A profile may qualify a triad. Reject con
 ## Council Profiles
 
 ### `classic` (default)
+
 All 22 members with the domain triads above.
 
 ### `exploration-orthogonal`
+
 12-member panel for discovery and "unknown unknowns" reduction.
 
 **Members**: Socrates, Feynman, Sun Tzu, Machiavelli, Ada, Lao Tzu, Aurelius, Torvalds, Karpathy, Sutskever, Kahneman, Meadows
 
 **Exploration triads:**
+
 - `unknowns` → Socrates + Lao Tzu + Feynman
 - `market-entry` → Sun Tzu + Machiavelli + Aurelius
 - `system-design` → Ada + Feynman + Torvalds
@@ -173,32 +133,19 @@ All 22 members with the domain triads above.
 - `blind-spots` → Kahneman + Meadows + Socrates
 
 ### `execution-lean`
+
 5-member panel for fast decision-to-action loops.
 
 **Members**: Torvalds, Feynman, Sun Tzu, Aurelius, Ada
 
 **Execution triads:**
+
 - `ship-now` → Torvalds + Feynman + Aurelius
 - `launch-strategy` → Sun Tzu + Torvalds + Machiavelli (optional substitute)
 - `stability` → Ada + Feynman + Aurelius
 
 ### `ai-creator-learner`
+
 8-member panel for the content-production loop from comprehensible input through working artifact and audience clarity.
 
 **Members**: karpathy, torvalds, feynman, rubin, jobs, leonardo, krashen, rams
-
----
-
-## Host Adapter
-
-- `host`: `claude`; native provider: `Anthropic`.
-- `skill_root`: the directory containing this invoked SKILL. Resolve relative assets here, including custom install directories.
-- Native dispatch: Claude Code native agent tools; resolve the current tool schema. Use the selected persona as the native subagent type when supported. Only this host may interpret `opus`/`sonnet`/`haiku` as native aliases.
-- Assets: For Claude installations, member files are at the sibling `../../agents/` relative to `skill_root`. In the repository they are at `./agents/`. Prefer the path belonging to the invoked installation, not another client.
-- Detect candidates: `bash {skill_root}/scripts/detect-providers.sh --host claude`. Tool availability and user authorization still filter these candidates.
-- Native fallback: a separate supported invocation on this host, using its actual model. If native delegation is unavailable, use labeled simulation under the shared policy.
-- Concurrency: use the actual runtime capacity and bounded batches; do not assume all 22 seats fit simultaneously.
-
-## Execution Protocol
-
-Follow [the shared protocol](protocol/core.md) from STEP 0 through final verification in every mode. Use [the runtime contract](protocol/runtime.md) for `route`, `tally`, dispatch and failure provenance. There are no client-specific voting or fallback rules.
