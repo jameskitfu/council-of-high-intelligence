@@ -1,10 +1,10 @@
 # Council Verdict Templates
 
-The canonical verdict templates are defined in [SKILL.md](../SKILL.md) under the "Output Templates" section.
+All clients use [the shared synthesis contract](../protocol/core.md#step-7-chairman-synthesis-and-output).
 
-Three templates are available:
-- **Council Verdict** — full 3-round deliberation output
-- **Quick Verdict** — rapid 2-round output (used with `--quick`)
-- **Duo Verdict** — dialectic output (used with `--duo`)
+- Full: detailed verdict with actual routing, tally, quorum, exclusions and minority report.
+- Quick: condensed verdict with the same mechanical decision rules.
+- Duo: dialectic with two positions and no winning council vote.
+- Fully simulated: multi-perspective analysis, explicitly labeled, with no independent consensus claim.
 
-Refer to SKILL.md as the single source of truth for template structure.
+See [runtime input/output examples](../protocol/runtime.md) for reproducible routing and voting cases.

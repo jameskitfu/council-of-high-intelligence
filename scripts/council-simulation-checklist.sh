@@ -32,86 +32,10 @@ pass "Provider/model slot template exists"
 
 [[ -f "CLAUDE.md" ]] || warn "CLAUDE.md is missing (recommended for project conventions)"
 
-# --- SKILL.md content checks ---
+# --- Shared runtime behavior ---
 
-grep -q "exploration-orthogonal" SKILL.md || fail "exploration-orthogonal profile missing in SKILL.md"
-pass "exploration-orthogonal profile documented in SKILL.md"
-
-grep -q "execution-lean" SKILL.md || fail "execution-lean profile missing in SKILL.md"
-pass "execution-lean profile documented in SKILL.md"
-
-grep -q -- "--models" SKILL.md || fail "--models flag missing in SKILL.md"
-pass "--models flag documented in SKILL.md"
-
-grep -q -- "--quick" SKILL.md || fail "--quick flag missing in SKILL.md"
-pass "--quick mode documented in SKILL.md"
-
-grep -q -- "--duo" SKILL.md || fail "--duo flag missing in SKILL.md"
-pass "--duo mode documented in SKILL.md"
-
-grep -q "CHECKPOINT" SKILL.md || fail "Execution checkpoints missing in SKILL.md"
-pass "Execution checkpoints present in SKILL.md"
-
-grep -q "VERIFY" SKILL.md || fail "Verification steps missing in SKILL.md"
-pass "Verification steps present in SKILL.md"
-
-# Round 2 anonymization (issue #17) — protect against silent regression
-grep -q "ANONYMIZED" SKILL.md || fail "Round 2 anonymization missing in SKILL.md (issue #17)"
-grep -q "Member A" SKILL.md || fail "Member-label vocabulary missing in SKILL.md (issue #17)"
-pass "Round 2 anonymization wired in SKILL.md"
-
-grep -q "anonymiz" SKILL.codex.md || fail "Round 2 anonymization missing in SKILL.codex.md (issue #17)"
-pass "Round 2 anonymization wired in SKILL.codex.md"
-
-# Anti-conformity directive (issue #19) — must be in every Round 2 prompt
-ac_count_skill=$(grep -c "Anti-conformity directive" SKILL.md || true)
-if [[ "$ac_count_skill" -lt 3 ]]; then
-  fail "Anti-conformity directive missing from one or more Round 2 prompts in SKILL.md (issue #19; expected ≥3 occurrences, found ${ac_count_skill})"
-fi
-pass "Anti-conformity directive present in all 3 Round 2 prompts in SKILL.md"
-
-grep -q "Anti-conformity directive" SKILL.codex.md || fail "Anti-conformity directive missing in SKILL.codex.md (issue #19)"
-pass "Anti-conformity directive present in SKILL.codex.md"
-
-# Chairman role (issue #18) — must be wired into STEP 1.7, STEP 7, flags, and Codex
-grep -q "STEP 1.7" SKILL.md || fail "Chairman selection step missing in SKILL.md (issue #18)"
-grep -q -- "--chairman" SKILL.md || fail "--chairman flag missing in SKILL.md (issue #18)"
-grep -q "CHAIRMAN" SKILL.md || fail "Chairman synthesis step missing in SKILL.md (issue #18)"
-pass "Chairman role wired in SKILL.md (STEP 1.7 + --chairman flag + synthesis step)"
-
-grep -q -i "chairman" SKILL.codex.md || fail "Chairman role missing in SKILL.codex.md (issue #18)"
-pass "Chairman role wired in SKILL.codex.md"
-
-grep -q "chairman_defaults" configs/auto-route-defaults.yaml || fail "chairman_defaults block missing in auto-route-defaults.yaml (issue #18)"
-pass "Chairman defaults configured in auto-route-defaults.yaml"
-
-# Verdict actionability sections (issue #21)
-grep -q "Acceptable Compromises" SKILL.md || fail "Acceptable Compromises section missing in SKILL.md (issue #21)"
-grep -q "Kill Criteria" SKILL.md || fail "Kill Criteria section missing in SKILL.md (issue #21)"
-grep -q "Concrete Next Step" SKILL.md || fail "Concrete Next Step section missing in SKILL.md (issue #21)"
-pass "Verdict actionability sections present in SKILL.md (Acceptable Compromises / Kill Criteria / Concrete Next Step)"
-
-grep -q "Acceptable Compromises" SKILL.codex.md || fail "Acceptable Compromises missing in SKILL.codex.md (issue #21)"
-grep -q "Kill Criteria" SKILL.codex.md || fail "Kill Criteria missing in SKILL.codex.md (issue #21)"
-grep -q "Concrete Next Step" SKILL.codex.md || fail "Concrete Next Step missing in SKILL.codex.md (issue #21)"
-pass "Verdict actionability sections present in SKILL.codex.md"
-
-# OpenAI-compatible API archetype (issue #16) — must be wired in dispatch + routing
-grep -q "openai_compatible_api" SKILL.md || fail "openai_compatible_api archetype missing in SKILL.md (issue #16)"
-grep -q "base_url" SKILL.md || fail "base_url handling missing in SKILL.md (issue #16)"
-grep -q "api_key_env" SKILL.md || fail "api_key_env handling missing in SKILL.md (issue #16)"
-pass "openai_compatible_api archetype wired in SKILL.md (dispatch + base_url + api_key_env)"
-
-grep -q "openai_compatible_api\|openai-compatible\|OpenAI-Compatible" SKILL.codex.md || fail "openai_compatible_api archetype missing in SKILL.codex.md (issue #16)"
-pass "openai_compatible_api archetype wired in SKILL.codex.md"
-
-# Session Metadata schema (issue #7 Phase 1)
-grep -q "Session Metadata" SKILL.md || fail "Session Metadata block missing in SKILL.md (issue #7)"
-grep -q "schema_version: 1" SKILL.md || fail "schema_version: 1 marker missing in SKILL.md Session Metadata (issue #7)"
-pass "Session Metadata schema wired in SKILL.md"
-
-grep -q "Session Metadata\|session metadata\|session_metadata" SKILL.codex.md || fail "Session Metadata missing in SKILL.codex.md (issue #7)"
-pass "Session Metadata referenced in SKILL.codex.md"
+python3 -m unittest discover -s tests -v
+pass "Runtime decisions, provider detection and isolated client installations passed"
 
 # --- Exact council graph and schema validation ---
 
@@ -313,6 +237,14 @@ for path in agent_paths:
         errors.append(f"{path}: council.provider_affinity is missing from YAML frontmatter or empty")
 
 skill_text = Path("SKILL.md").read_text()
+shared_catalog = Path("protocol/panels.md").read_text()
+for heading in ("The 22 Council Members", "Polarity Pairs", "Pre-defined Triads", "Duo Polarity Pairs (for `--duo` mode)", "Council Profiles"):
+    shared_section = [line.strip() for line in markdown_section(shared_catalog, heading)
+                     if line.strip() not in ("", "---")]
+    skill_section = [line.strip() for line in markdown_section(skill_text, heading)
+                    if line.strip() not in ("", "---")]
+    if shared_section != skill_section:
+        errors.append(f"Shared catalog and Claude discovery catalog differ in {heading}")
 skill_roster_rows = table_rows(markdown_section(skill_text, "The 22 Council Members"))
 figure_to_id = {}
 skill_roster_ids = []
@@ -633,10 +565,18 @@ pass "Verdict template dedup check done"
 pass "detect-providers.sh exists and is executable"
 
 if detect_output="$(bash scripts/detect-providers.sh 2>/dev/null)"; then
-  if echo "$detect_output" | grep -q '"provider_count"'; then
-    pass "detect-providers.sh produces valid JSON"
+  if printf '%s' "$detect_output" | python3 -c '
+import json, sys
+value = json.load(sys.stdin)
+assert value["schema_version"] == 2
+assert value["host"] in ("claude", "codex", "gemini")
+assert all(type(p["available"]) is bool for p in value["providers"])
+assert value["provider_count"] == sum(p["available"] for p in value["providers"])
+assert value["multi_provider"] == (value["provider_count"] >= 2)
+'; then
+    pass "detect-providers.sh produces valid JSON with consistent candidate counts"
   else
-    fail "detect-providers.sh output missing provider_count field"
+    fail "detect-providers.sh returned invalid JSON or inconsistent candidate counts"
   fi
 else
   fail "detect-providers.sh exited with error"
@@ -654,8 +594,8 @@ pass "--dry-route flag documented in SKILL.md"
 # --- Install script checks ---
 
 if command -v shellcheck >/dev/null 2>&1; then
-  shellcheck install.sh
-  pass "shellcheck passed for install.sh"
+  shellcheck install.sh scripts/detect-providers.sh scripts/council-simulation-checklist.sh
+  pass "shellcheck passed for installer and scripts"
 else
   warn "shellcheck not installed; skipped"
 fi

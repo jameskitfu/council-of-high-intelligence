@@ -245,18 +245,19 @@ All 22 members with domain triads above. Best for broad deliberation.
 
 ## Multi-Provider Auto-Routing
 
-The council automatically detects installed LLM providers and distributes members across them for genuine model diversity — zero config required.
+The council detects provider candidates for the current host and distributes members across authorized candidates. Detection separates installation from authentication and inference readiness; a working version command is not proof that a model call will succeed.
 
 ```
 /council --triad decision Should we accept this acquisition offer?
 ```
 
 **Supported providers** (auto-detected):
+
 | Provider | CLI | Exec Method |
 |----------|-----|-------------|
-| Anthropic (Claude) | native | subagent (always available) |
-| OpenAI | `codex` | `codex exec` |
-| Google | `gemini` | `gemini -p` |
+| Anthropic (Claude) | native in Claude; `claude` elsewhere | native subagent or `claude -p` |
+| OpenAI | native in Codex; `codex` elsewhere | native subagent or `codex exec` |
+| Google | native in Gemini; `gemini` elsewhere | native subagent or `gemini -p` |
 | Ollama (local) | `ollama` | `ollama run` |
 | NVIDIA NIM | `NVIDIA_API_KEY` env | `openai_compatible_api` |
 | Cursor | `cursor-agent` | `cursor-agent -p` |
@@ -266,17 +267,19 @@ NVIDIA NIM ([build.nvidia.com](https://build.nvidia.com)) exposes 130+ open-weig
 Cursor CLI ([cursor.com/cli](https://cursor.com/cli)) is a model **aggregator** — one binary (`cursor-agent`) serves GPT-5.x, Claude, Gemini, and Grok families through a single `CURSOR_API_KEY` (or `cursor-agent login`). Members route via headless read-only mode (`cursor-agent -p --mode ask --model <id>`). Install with `curl https://cursor.com/install -fsS | bash`. Because Cursor can serve `claude-*` models, pick **cross-family** Cursor models (e.g. `gpt-5.4-high`, `gemini-2.5-pro`, `grok-4`) when a seat needs to add diversity rather than duplicate Anthropic bias. List live IDs with `cursor-agent --list-models`. See `configs/provider-model-slots.cursor.example.yaml` for a sample seat allocation.
 
 **How routing works:**
-1. Polarity pairs are separated across providers (hard constraint)
-2. Members spread evenly across available providers
-3. Per-member `provider_affinity` in frontmatter used as tiebreaker
-4. If any provider fails, automatic fallback to Claude
+1. The route helper seeks polarity separation while preserving explicit assignments.
+2. Impossible constraints return `relaxed` with exact collocated pairs; exhausted search returns `search_limit`, not a false proof of impossibility. Provider spread is a soft preference.
+3. Per-member `provider_affinity` breaks otherwise equal choices. Actual model-family overlap is disclosed separately from provider IDs.
+4. A failed external call uses a remaining attempt on the current authorized host; unavailable native delegation leads to labeled simulation, never an assumed Claude invocation.
 
 **Flags:**
-- `--no-auto-route` — disable auto-routing, use Claude-only defaults
+- `--no-auto-route` — disable auto-routing, use the current host and its supported default model
 - `--dry-route` — print the routing table without running the council
 - `--models [path]` — manual override with YAML config (see `configs/provider-model-slots.example.yaml`)
 
 ## Deliberation Protocol
+
+All three clients read one [shared execution protocol](protocol/core.md), [runtime contract](protocol/runtime.md) and [panel catalog](protocol/panels.md). Only native tool adaptation differs.
 
 Full mode runs 7 steps: provider routing → problem restate gate → independent analysis → cross-examination → enforcement scan → final positions → verdict synthesis. Verdicts lead with what the council doesn't know.
 
@@ -305,7 +308,8 @@ Full mode runs 7 steps: provider routing → problem restate gate → independen
 - **Bounded protocol is the forcing function** — deliberation runs a fixed round budget (full 3 / quick 2 / duo 3), so it cannot loop. Anti-recursion guards (the "hemlock rule" caps Socrates' questioning; any pair exceeding 2 messages is cut off) enforce the bound mid-round.
 - Dissent quota + novelty gate + counterfactual pass prevent premature convergence
 - **Tie-breaking is a counted tally, not a prose impression** — each member emits a structured `STANCE:` line in the final round; consensus requires a **domain-weighted 2/3 majority** (the on-domain seat carries 1.5×, designated *before* positions exist). A genuine split is escalated to the user with the full tally rather than forced into false consensus.
-- All verdicts include a Vote Tally and a Follow-Up section for outcome tracking
+- Full/quick decisions use the shared Python tally: valid live quorum is at least two seats and two-thirds of the original panel. Simulated/offline/malformed responses supply no support; the original weighted denominator remains fixed. Duo produces no winning vote. All modes include Follow-Up for outcome tracking.
+- In a weighted triad, the two ordinary seats alone cannot clear the 2/3 threshold. This is an explicit consequence of retaining the 1.5× domain weight, not a probability of correctness.
 
 </details>
 
@@ -325,6 +329,8 @@ Installs 22 council agents plus skill files for Claude, Codex, and/or Gemini CLI
 ./install.sh --dry-run                          # Preview without writing
 ./install.sh --copy-configs                     # Also install model routing templates
 ```
+
+Shared protocol, Python helpers and required defaults are installed automatically. Existing defaults are preserved unless `--copy-configs` is explicitly used. Python 3.9+ is required.
 
 Restart your target client(s) after installing. Run `./scripts/council-simulation-checklist.sh` to validate. Try the [demo session pack](demos/session-pack.md) to test all modes.
 

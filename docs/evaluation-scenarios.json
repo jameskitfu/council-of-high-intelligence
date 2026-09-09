@@ -1,0 +1,481 @@
+{
+  "schema_version": 1,
+  "evaluated_at_utc": "2026-09-08T08:24:36.956932+00:00",
+  "scope": "Bounded consuming-agent scenarios using scenario-supplied capability fixtures and actual repository Python helper executions. No inference, external-provider invocation, real host capability probe, agent spawn, installation, or implementation edit was performed. This does not prove external runtime compatibility.",
+  "hashes_note": "The source hashes identify the snapshot used for the evaluator run. Final documentation wording and input-validation fixes were applied afterward; the helper results and conclusions remain covered by the final automated tests.",
+  "sources_sha256": {
+    "SKILL.codex.md": "e1b4bfd47a51bb0e28a71bdc08575735134e82368129470168a7f8d076911882",
+    "SKILL.gemini.md": "e31980cce28b963f51916ba89425cb89136a53be356842f4b747a87f9779dc0d",
+    "SKILL.md": "bd496cb45b9fbfacbe293e2747c26ce6db4260534fe629486c6c7d8080998cab",
+    "protocol/core.md": "21f955d25881081bff5047460c46fdbaca2f4ded26f96b88fce4e1d7f1c13baa",
+    "protocol/runtime.md": "952999e58c899dd89b191f069e356227111aefcc457966a8103381b26e419b7c",
+    "protocol/panels.md": "5078e117001aed838f8c507e4c38ab0c8e4bcf89b2c18f5785d664c444171217",
+    "agents/council-jobs.md": "67d32896ccc793f8915168d76fbe7a7673b1e0411b42d08fb64dbf072c1994c9",
+    "agents/council-rubin.md": "fd6c59160501e05749c22ff68d9aedccfc04725abfe385e0496700b7776d9c64",
+    "agents/council-torvalds.md": "251e6b22e2f94a8ff88d235c549b5ab0b98d4b5661763d16a02eb822d4800ca2",
+    "configs/auto-route-defaults.yaml": "72271ca7b03648dcd9920beefc09f43018a6d53e8c7c09465155f15bebe929de",
+    "scripts/council_runtime.py": "959cea4a47537f437ec1dbf792549a66e6592adba6b5b92610e14e6151686835"
+  },
+  "commands": {
+    "A_route": {
+      "command_argv": [
+        "python3",
+        "/Users/fuhuan/Documents/ChatGPT/council/scripts/council_runtime.py",
+        "route",
+        "--input",
+        "/var/folders/x9/4_pqtdzs3tl3_z5mxpgdw2lr0000gn/T/council-scenario-evaluation-aooqlu87/A_route.json"
+      ],
+      "input": {
+        "members": [
+          {
+            "id": "jobs",
+            "polarity_pairs": [
+              "rubin",
+              "rams",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "openai"
+            ]
+          },
+          {
+            "id": "rubin",
+            "polarity_pairs": [
+              "jobs",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "google"
+            ]
+          },
+          {
+            "id": "torvalds",
+            "polarity_pairs": [
+              "watts",
+              "musashi",
+              "meadows",
+              "jobs",
+              "rubin"
+            ],
+            "provider_affinity": [
+              "openai",
+              "anthropic"
+            ]
+          }
+        ],
+        "providers": [
+          {
+            "name": "openai",
+            "available": true
+          }
+        ],
+        "manual": {}
+      },
+      "exit_code": 0,
+      "stdout": "{\"status\": \"relaxed\", \"assignments\": {\"jobs\": \"openai\", \"rubin\": \"openai\", \"torvalds\": \"openai\"}, \"conflicts\": [[\"jobs\", \"rubin\"], [\"jobs\", \"torvalds\"], [\"rubin\", \"torvalds\"]], \"nodes\": 4, \"provider_counts\": {\"openai\": 3}, \"manual_members\": [], \"reason\": \"zero-conflict assignment impossible under supplied constraints\"}\n",
+      "stderr": "",
+      "parsed_result": {
+        "status": "relaxed",
+        "assignments": {
+          "jobs": "openai",
+          "rubin": "openai",
+          "torvalds": "openai"
+        },
+        "conflicts": [
+          [
+            "jobs",
+            "rubin"
+          ],
+          [
+            "jobs",
+            "torvalds"
+          ],
+          [
+            "rubin",
+            "torvalds"
+          ]
+        ],
+        "nodes": 4,
+        "provider_counts": {
+          "openai": 3
+        },
+        "manual_members": [],
+        "reason": "zero-conflict assignment impossible under supplied constraints"
+      }
+    },
+    "A_tally": {
+      "command_argv": [
+        "python3",
+        "/Users/fuhuan/Documents/ChatGPT/council/scripts/council_runtime.py",
+        "tally",
+        "--input",
+        "/var/folders/x9/4_pqtdzs3tl3_z5mxpgdw2lr0000gn/T/council-scenario-evaluation-aooqlu87/A_tally.json"
+      ],
+      "input": {
+        "mode": "quick",
+        "panel": [
+          "jobs",
+          "rubin",
+          "torvalds"
+        ],
+        "domain_weight": "jobs",
+        "options": [
+          "ship",
+          "wait"
+        ],
+        "responses": [
+          {
+            "member": "jobs",
+            "status": "degraded",
+            "text": "[Simulated] ship"
+          },
+          {
+            "member": "rubin",
+            "status": "live",
+            "execution_id": "c12/rubin/r2",
+            "text": "STANCE: ship | CONFIDENCE: high | DEALBREAKER: no"
+          },
+          {
+            "member": "torvalds",
+            "status": "live",
+            "execution_id": "c13/torvalds/r2",
+            "text": "STANCE: ship | CONFIDENCE: high | DEALBREAKER: no"
+          }
+        ]
+      },
+      "exit_code": 0,
+      "stdout": "{\"status\": \"split\", \"winner\": null, \"votes\": {\"ship\": 2.0, \"wait\": 0.0}, \"total_weight\": 3.5, \"threshold\": 2.3333333333333335, \"required_live\": 2, \"live_count\": 2, \"accepted\": {\"rubin\": {\"stance\": \"ship\", \"confidence\": \"high\", \"dealbreaker\": false}, \"torvalds\": {\"stance\": \"ship\", \"confidence\": \"high\", \"dealbreaker\": false}}, \"excluded\": {\"jobs\": \"degraded\"}, \"minority_dealbreakers\": []}\n",
+      "stderr": "",
+      "parsed_result": {
+        "status": "split",
+        "winner": null,
+        "votes": {
+          "ship": 2.0,
+          "wait": 0.0
+        },
+        "total_weight": 3.5,
+        "threshold": 2.3333333333333335,
+        "required_live": 2,
+        "live_count": 2,
+        "accepted": {
+          "rubin": {
+            "stance": "ship",
+            "confidence": "high",
+            "dealbreaker": false
+          },
+          "torvalds": {
+            "stance": "ship",
+            "confidence": "high",
+            "dealbreaker": false
+          }
+        },
+        "excluded": {
+          "jobs": "degraded"
+        },
+        "minority_dealbreakers": []
+      }
+    },
+    "B_route": {
+      "command_argv": [
+        "python3",
+        "/Users/fuhuan/Documents/ChatGPT/council/scripts/council_runtime.py",
+        "route",
+        "--input",
+        "/var/folders/x9/4_pqtdzs3tl3_z5mxpgdw2lr0000gn/T/council-scenario-evaluation-aooqlu87/B_route.json"
+      ],
+      "input": {
+        "members": [
+          {
+            "id": "jobs",
+            "polarity_pairs": [
+              "rubin",
+              "rams",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "openai"
+            ]
+          },
+          {
+            "id": "rubin",
+            "polarity_pairs": [
+              "jobs",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "google"
+            ]
+          },
+          {
+            "id": "torvalds",
+            "polarity_pairs": [
+              "watts",
+              "musashi",
+              "meadows",
+              "jobs",
+              "rubin"
+            ],
+            "provider_affinity": [
+              "openai",
+              "anthropic"
+            ]
+          }
+        ],
+        "providers": [],
+        "manual": {}
+      },
+      "exit_code": 0,
+      "stdout": "{\"status\": \"analysis_only\", \"assignments\": {}, \"conflicts\": [], \"unassigned\": [\"jobs\", \"rubin\", \"torvalds\"], \"nodes\": 0, \"reason\": \"no available provider candidates\"}\n",
+      "stderr": "",
+      "parsed_result": {
+        "status": "analysis_only",
+        "assignments": {},
+        "conflicts": [],
+        "unassigned": [
+          "jobs",
+          "rubin",
+          "torvalds"
+        ],
+        "nodes": 0,
+        "reason": "no available provider candidates"
+      }
+    },
+    "B_tally": {
+      "command_argv": [
+        "python3",
+        "/Users/fuhuan/Documents/ChatGPT/council/scripts/council_runtime.py",
+        "tally",
+        "--input",
+        "/var/folders/x9/4_pqtdzs3tl3_z5mxpgdw2lr0000gn/T/council-scenario-evaluation-aooqlu87/B_tally.json"
+      ],
+      "input": {
+        "mode": "quick",
+        "panel": [
+          "jobs",
+          "rubin",
+          "torvalds"
+        ],
+        "domain_weight": "jobs",
+        "options": [
+          "ship",
+          "wait"
+        ],
+        "responses": [
+          {
+            "member": "jobs",
+            "status": "degraded",
+            "text": "[Simulated] STANCE: ship | CONFIDENCE: high | DEALBREAKER: no"
+          },
+          {
+            "member": "rubin",
+            "status": "degraded",
+            "text": "[Simulated] STANCE: ship | CONFIDENCE: high | DEALBREAKER: no"
+          },
+          {
+            "member": "torvalds",
+            "status": "degraded",
+            "text": "[Simulated] STANCE: ship | CONFIDENCE: high | DEALBREAKER: no"
+          }
+        ]
+      },
+      "exit_code": 0,
+      "stdout": "{\"status\": \"analysis_only\", \"winner\": null, \"votes\": {\"ship\": 0.0, \"wait\": 0.0}, \"total_weight\": 3.5, \"threshold\": 2.3333333333333335, \"required_live\": 2, \"live_count\": 0, \"accepted\": {}, \"excluded\": {\"jobs\": \"degraded\", \"rubin\": \"degraded\", \"torvalds\": \"degraded\"}, \"minority_dealbreakers\": []}\n",
+      "stderr": "",
+      "parsed_result": {
+        "status": "analysis_only",
+        "winner": null,
+        "votes": {
+          "ship": 0.0,
+          "wait": 0.0
+        },
+        "total_weight": 3.5,
+        "threshold": 2.3333333333333335,
+        "required_live": 2,
+        "live_count": 0,
+        "accepted": {},
+        "excluded": {
+          "jobs": "degraded",
+          "rubin": "degraded",
+          "torvalds": "degraded"
+        },
+        "minority_dealbreakers": []
+      }
+    },
+    "C_route": {
+      "command_argv": [
+        "python3",
+        "/Users/fuhuan/Documents/ChatGPT/council/scripts/council_runtime.py",
+        "route",
+        "--input",
+        "/var/folders/x9/4_pqtdzs3tl3_z5mxpgdw2lr0000gn/T/council-scenario-evaluation-aooqlu87/C_route.json"
+      ],
+      "input": {
+        "members": [
+          {
+            "id": "jobs",
+            "polarity_pairs": [
+              "rubin",
+              "rams",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "openai"
+            ]
+          },
+          {
+            "id": "rubin",
+            "polarity_pairs": [
+              "jobs",
+              "torvalds"
+            ],
+            "provider_affinity": [
+              "anthropic",
+              "google"
+            ]
+          },
+          {
+            "id": "torvalds",
+            "polarity_pairs": [
+              "watts",
+              "musashi",
+              "meadows",
+              "jobs",
+              "rubin"
+            ],
+            "provider_affinity": [
+              "openai",
+              "anthropic"
+            ]
+          }
+        ],
+        "providers": [
+          {
+            "name": "anthropic",
+            "available": true
+          },
+          {
+            "name": "openai",
+            "available": true
+          }
+        ],
+        "manual": {}
+      },
+      "exit_code": 0,
+      "stdout": "{\"status\": \"relaxed\", \"assignments\": {\"jobs\": \"anthropic\", \"rubin\": \"openai\", \"torvalds\": \"openai\"}, \"conflicts\": [[\"rubin\", \"torvalds\"]], \"nodes\": 11, \"provider_counts\": {\"anthropic\": 1, \"openai\": 2}, \"manual_members\": [], \"reason\": \"zero-conflict assignment impossible under supplied constraints\"}\n",
+      "stderr": "",
+      "parsed_result": {
+        "status": "relaxed",
+        "assignments": {
+          "jobs": "anthropic",
+          "rubin": "openai",
+          "torvalds": "openai"
+        },
+        "conflicts": [
+          [
+            "rubin",
+            "torvalds"
+          ]
+        ],
+        "nodes": 11,
+        "provider_counts": {
+          "anthropic": 1,
+          "openai": 2
+        },
+        "manual_members": [],
+        "reason": "zero-conflict assignment impossible under supplied constraints"
+      }
+    }
+  },
+  "observations": {
+    "A": {
+      "final_status": "split",
+      "winner": null,
+      "final_explanation_zh": "未形成委员会共识。Rubin 和 Torvalds 的两个独立调用支持 ship，达到 2 人法定人数；但支持权重只有 2.0，原始分母为 3.5，共识门槛是 7/3。Jobs 的 1.5 权重保留在分母，其模拟文本不计票。用户催促不能将此结果表述为已形成共识。",
+      "next_dispatch": "No more member calls: quick deliberation is finished and Jobs exhausted the 3-attempt budget. If the selected Chairman audit is still pending, issue its one separate authorized native OpenAI invocation with the complete transcript and unaltered split tally. It may provide a conditional recommendation; it cannot add a vote, reuse a member context, change the domain weight, or start another round. If the Chairman already ran, dispatch nothing. If this single audit attempt fails, label coordinator fallback explicitly.",
+      "provider_disclosure": "All planned seats collide on openai; Rubin and Torvalds are separately counted only because c12 and c13 are distinct scenario-supplied calls. The scenario does not specify actual model IDs, so these remain unknown; disclose common provider and confirm actual model-family overlap from logs before naming a family.",
+      "evidence_boundary": "c12 and c13 are observed calls within the scenario fixture, not calls made in this evaluation. There is no product evidence or release authorization here, so no real-world shipping action is implied."
+    },
+    "B": {
+      "final_status": "analysis_only",
+      "winner": null,
+      "report_title": "Multi-perspective analysis — simulated",
+      "final_explanation_zh": "仅有协调者模拟分析，没有独立投票。3 个席位全部 degraded；有效 live 数为 0，所需为 2，ship 支持权重为 0，原始总权重仍为 3.5。",
+      "next_dispatch": "None. Native Google delegation is unavailable and no external provider is authorized. Do not invent invoke_agent, fall back to Claude/OpenAI, install a tool, or claim a Chairman model invocation. Finish a clearly labeled coordinator simulation report. A future real council requires actual available independent invocation capability and existing or new relevant provider authorization; it is not automatically launched.",
+      "chairman_outcome": "unavailable — coordinator synthesis; no attempt made. This truthful label is an evaluator interpretation because the protocol specifies a failed-attempt fallback but not the no-dispatch-capability branch."
+    },
+    "C": {
+      "final_status": "dry-route complete; route status relaxed",
+      "winner": null,
+      "assignments": {
+        "jobs": "anthropic",
+        "rubin": "openai",
+        "torvalds": "openai"
+      },
+      "collocated_pairs": [
+        [
+          "rubin",
+          "torvalds"
+        ]
+      ],
+      "explanation": "Jobs, Rubin, and Torvalds form a triangle. With two provider candidates, exhaustive helper search finds a minimum of one collocated pair: Rubin and Torvalds on openai. Jobs is on anthropic. Provider affinity is soft, so this is not rejected because Rubin prefers anthropic/google.",
+      "routing_details": [
+        {
+          "member": "jobs",
+          "provider": "anthropic",
+          "model": "actual supported Claude host default; exact ID unspecified",
+          "exec_method": "native adapter if present; exact tool unspecified",
+          "readiness": "authorized scenario candidate, inference not verified"
+        },
+        {
+          "member": "rubin",
+          "provider": "openai",
+          "model_suggestion": "gpt-5.4",
+          "exec_method": null,
+          "readiness": "authorized scenario candidate, concrete dispatch method and inference not verified"
+        },
+        {
+          "member": "torvalds",
+          "provider": "openai",
+          "model_suggestion": "gpt-5.4",
+          "exec_method": null,
+          "readiness": "authorized scenario candidate, concrete dispatch method and inference not verified"
+        }
+      ],
+      "next_dispatch": "None. Stop at the routing checkpoint. No restatement, member, Chairman, inference probe, or deliberation round follows --dry-route. Do not assume a Codex CLI or API exists simply because openai is a supplied candidate.",
+      "precision_limit": "The supplied fixture is enough to resolve provider assignment; it does not provide a native default model or external exec_method. A full execution-ready routing table cannot be verified from these inputs. Model suggestions are not live availability evidence."
+    },
+    "protocol_observations": [
+      {
+        "severity": "bounded ambiguity",
+        "location": "protocol/core.md:46-48 and :21",
+        "finding": "The shared protocol supports analysis_only with no candidates, but Chairman selection is unconditional in every mode and describes coordinator fallback only after a failed attempt. In Scenario B no attempt can occur. The result status is unambiguous, but strict completion of the Chairman step is impossible without interpreting an unavailable branch. Make unavailable/no invocation an explicit coordinator-synthesis outcome; do not record failed when nothing ran."
+      },
+      {
+        "severity": "no contradiction affecting the evaluated outcome",
+        "location": "protocol/core.md:70 and persona Council Round 2 templates",
+        "finding": "Although persona files contain general Round 2 formats, the shared core explicitly limits their use to full mode and gives quick its final-position instructions. This is enough to follow quick without an extra cross-examination round."
+      },
+      {
+        "severity": "input limitation, not a protocol contradiction",
+        "location": "protocol/core.md:18-25",
+        "finding": "Scenario C does not supply tool schemas/default model IDs. The provider graph result is verified, while exact tools/models must remain unspecified. Dry-route still permits zero model calls and cannot silently become a readiness inference probe."
+      }
+    ],
+    "verification": {
+      "helper_invocations": 5,
+      "all_exit_codes_zero": true,
+      "assertions": [
+        "A tally is split with ship 2.0 / 3.5, required_live=2 and live_count=2",
+        "B route and tally are analysis_only; every simulated seat excluded",
+        "C route is relaxed with exactly one collocated pair",
+        "No external model or native member invocation was made"
+      ],
+      "limitations": "This is behavioral evidence for three bounded sessions, not live provider integration or external runtime compatibility proof."
+    }
+  }
+}

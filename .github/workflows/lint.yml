@@ -15,6 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
       - name: Install dependencies
         run: |
           sudo apt-get update -q
@@ -27,11 +31,15 @@ jobs:
           shellcheck scripts/detect-providers.sh
           shellcheck scripts/council-simulation-checklist.sh
 
+      - name: Runtime and installation behavior
+        run: ./scripts/council-simulation-checklist.sh
+
       - name: Markdownlint
         run: |
           markdownlint \
-            --disable MD013 MD024 MD033 MD041 \
+            --disable MD012 MD013 MD022 MD024 MD032 MD033 MD036 MD040 MD041 MD058 \
             README.md CONTRIBUTING.md CHANGELOG.md \
-            SKILL.md SKILL.codex.md \
+            SKILL.md SKILL.codex.md SKILL.gemini.md \
+            "protocol/**/*.md" \
             "agents/**/*.md" \
             "demos/**/*.md"

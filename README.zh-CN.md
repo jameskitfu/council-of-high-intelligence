@@ -261,7 +261,7 @@ cd council-of-high-intelligence
 
 ## 多提供商自动路由
 
-议会会自动检测已安装的大语言模型提供商，并把成员分配给不同提供商，以获得真正的模型多样性——无需配置。
+议会按当前宿主检测候选提供商，并在已有授权范围内分配成员。安装状态、认证状态和推理可用性分别记录；版本命令成功不代表模型调用一定成功。
 
 ```
 /council --triad decision Should we accept this acquisition offer?
@@ -271,9 +271,9 @@ cd council-of-high-intelligence
 
 | 提供商 | CLI | 执行方式 |
 |--------|-----|----------|
-| Anthropic（Claude） | native | subagent（始终可用） |
-| OpenAI | `codex` | `codex exec` |
-| Google | `gemini` | `gemini -p` |
+| Anthropic（Claude） | Claude 中为原生，其他客户端使用 `claude` | 原生子代理或 `claude -p` |
+| OpenAI | Codex 中为原生，其他客户端使用 `codex` | 原生子代理或 `codex exec` |
+| Google | Gemini 中为原生，其他客户端使用 `gemini` | 原生子代理或 `gemini -p` |
 | Ollama（本地） | `ollama` | `ollama run` |
 | NVIDIA NIM | `NVIDIA_API_KEY` 环境变量 | `openai_compatible_api` |
 | Cursor | `cursor-agent` | `cursor-agent -p` |
@@ -284,18 +284,20 @@ Cursor CLI（[cursor.com/cli](https://cursor.com/cli)）是一个模型**聚合�
 
 **路由方式：**
 
-1. 极性配对会被分配到不同提供商（硬性约束）
-2. 成员尽可能均匀地分散到可用提供商
-3. 使用 frontmatter 中每位成员的 `provider_affinity` 处理平局
-4. 任意提供商失败时，自动回退到 Claude
+1. 路由脚本优先分离极性配对，并保留明确指定的分配。
+2. 约束无解时返回 `relaxed` 和具体冲突配对；搜索预算耗尽时返回 `search_limit`，不冒称已经证明无解。均匀分布是软偏好。
+3. 使用 frontmatter 中的 `provider_affinity` 处理同等选择；实际模型家族重叠另行披露，不把提供商数量当作独立性证明。
+4. 外部调用失败后，在剩余尝试次数内回退到当前已有授权的宿主；原生委派不可用时明确标记模拟，不假定 Claude 存在。
 
 **参数：**
 
-- `--no-auto-route`——关闭自动路由，使用仅 Claude 的默认配置
+- `--no-auto-route`——关闭自动路由，使用当前宿主及其支持的默认模型
 - `--dry-route`——只打印路由表，不实际运行议会
 - `--models [path]`——通过 YAML 配置手动覆盖（参见 `configs/provider-model-slots.example.yaml`）
 
 ## 审议协议
+
+三个客户端共用[执行协议](protocol/core.md)、[运行接口](protocol/runtime.md)和[成员目录](protocol/panels.md)，只在原生工具适配上存在区别。
 
 完整模式执行 7 个步骤：提供商路由 → 问题重述关卡 → 独立分析 → 交叉质询 → 约束扫描 → 最终立场 → 综合裁决。裁决首先说明议会不知道什么。
 
@@ -328,7 +330,8 @@ Cursor CLI（[cursor.com/cli](https://cursor.com/cli)）是一个模型**聚合�
 - **有界协议是核心强制机制**——审议采用固定轮数预算（完整模式 3 轮／快速模式 2 轮／双人模式 3 轮），因此不会无限循环。反递归护栏会在轮次内强制执行边界（“毒芹规则”限制苏格拉底的连续追问；任意配对往返超过 2 条消息即被截断）。
 - 异议配额 + 新颖性关卡 + 反事实检验可以防止过早收敛
 - **平局裁定依赖计数后的加权票数，而不是文字印象**——每位成员在最终轮输出结构化的 `STANCE:` 行；形成共识需要达到**按领域加权后的三分之二多数**（领域内席位权重为 1.5 倍，并且必须在立场形成之前指定）。如果确实存在分裂，系统会把完整票数交给用户，而不是强行制造虚假共识
-- 所有裁决都包含“投票统计”和用于跟踪结果的“后续行动”部分
+- 完整和快速模式由共享 Python 脚本计票：有效 live 席位至少为 2 个，且达到原始面板人数的三分之二。模拟、离线和格式无效的响应不增加支持票；原始加权分母保持不变。双人模式不产生胜出选项，所有模式保留“后续行动”。
+- 三人加权组中，两个普通席位单独支持不能达到共识门槛。这是保留 1.5 倍领域权重的明确结果，票数比例不代表正确概率。
 
 </details>
 
@@ -348,6 +351,8 @@ Cursor CLI（[cursor.com/cli](https://cursor.com/cli)）是一个模型**聚合�
 ./install.sh --dry-run                          # 只预览，不写入文件
 ./install.sh --copy-configs                     # 同时安装模型路由模板
 ```
+
+共享协议、Python 脚本和必需默认配置会自动安装。已有默认配置会保留，除非明确使用 `--copy-configs`；需要 Python 3.9 或以上版本。
 
 安装完成后请重启目标客户端。运行 `./scripts/council-simulation-checklist.sh` 进行验证。你还可以通过[演示会话包](demos/session-pack.md)测试所有模式。
 

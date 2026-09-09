@@ -143,6 +143,28 @@ fi
 
 CONFIGS_SRC_DIR="${SCRIPT_DIR}/configs"
 
+# These are runtime dependencies, not optional user routing examples.
+for required in protocol/core.md protocol/runtime.md protocol/panels.md scripts/council_runtime.py scripts/detect_providers.py configs/auto-route-defaults.yaml; do
+  if [[ ! -f "${SCRIPT_DIR}/${required}" ]]; then
+    echo "Error: required runtime asset missing: ${required}" >&2
+    exit 1
+  fi
+done
+
+install_shared_runtime() {
+  local skill_dest="$1"
+  run_cmd mkdir -p "${skill_dest}/protocol" "${skill_dest}/scripts" "${skill_dest}/configs"
+  for protocol_file in "${SCRIPT_DIR}"/protocol/*.md; do
+    run_cmd install -m 0644 "${protocol_file}" "${skill_dest}/protocol/"
+  done
+  run_cmd install -m 0755 "${SCRIPT_DIR}/scripts/council_runtime.py" "${skill_dest}/scripts/"
+  run_cmd install -m 0755 "${SCRIPT_DIR}/scripts/detect_providers.py" "${skill_dest}/scripts/"
+  # Preserve an existing user's routing defaults on a normal upgrade.
+  if [[ ! -f "${skill_dest}/configs/auto-route-defaults.yaml" ]]; then
+    run_cmd install -m 0644 "${CONFIGS_SRC_DIR}/auto-route-defaults.yaml" "${skill_dest}/configs/"
+  fi
+}
+
 echo "Installing Council of High Intelligence..."
 if [[ "${INSTALL_CLAUDE}" == true ]]; then
   AGENTS_DEST="${CLAUDE_DIR}/agents"
@@ -164,6 +186,7 @@ if [[ "${INSTALL_CLAUDE}" == true ]]; then
 
   echo "Installing Claude council skill..."
   run_cmd install -m 0644 "${SCRIPT_DIR}/SKILL.md" "${CLAUDE_SKILL_DEST}"
+  install_shared_runtime "${CLAUDE_SKILL_DEST_DIR}"
 
   echo "Installing Claude council scripts..."
   run_cmd mkdir -p "${CLAUDE_SCRIPTS_DEST_DIR}"
@@ -208,6 +231,7 @@ if [[ "${INSTALL_CODEX}" == true ]]; then
 
   echo "Installing Codex council skill..."
   run_cmd install -m 0644 "${SCRIPT_DIR}/SKILL.codex.md" "${CODEX_SKILL_DEST}"
+  install_shared_runtime "${CODEX_SKILL_DEST_DIR}"
 
   echo "Installing Codex council agents..."
   codex_agents_installed=0
@@ -273,6 +297,7 @@ EOF
 
   echo "Installing Gemini council skill..."
   run_cmd install -m 0644 "${SCRIPT_DIR}/SKILL.gemini.md" "${GEMINI_SKILL_DEST}"
+  install_shared_runtime "${GEMINI_EXT_DEST_DIR}"
 
   echo "Installing Gemini council agents..."
   gemini_agents_installed=0
